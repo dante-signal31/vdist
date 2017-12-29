@@ -22,7 +22,7 @@ before_install:
   # so we don't need to install it.
   - sudo apt-get install -qq libssl1.0.0
 install:
-  - pip install --user -r requirements.txt
+  - pip install -r requirements.txt
 env:
   - TEST_TAG = "test_generate_deb"
   - TEST_TAG = "centos6"
