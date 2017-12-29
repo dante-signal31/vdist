@@ -1,10 +1,16 @@
 language: python
+dist: trusty
+# We are going to need a full-VM.
+sudo: true
 python:
-  - "2.7"
-  - "3.6"
+  - 2.7
+  - 3.6
+  - nightly
 branches:
   only:
   - staging
+  # Just for tests of travis_integration. Remove when integration is done.
+  - travis_integration
 notifications:
   recipients:
   - dante.signal31@gmail.com
@@ -12,7 +18,9 @@ notifications:
   on_failure: always
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libssl1.0.0 docker.io
+  # To test we need docker.io but that comes already packaged in travis image
+  # so we don't need to install it.
+  - sudo apt-get install -qq libssl1.0.0
 install:
   - pip install --user -r requirements.txt
 env:
