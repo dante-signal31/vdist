@@ -1,1 +1,26 @@
 language: python
+python:
+  - "2.7"
+  - "3.6"
+branches:
+  only:
+  - staging
+notifications:
+  recipients:
+  - dante.signal31@gmail.com
+  on_sucess: always
+  on_failure: always
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libssl1.0.0 docker.io
+install:
+  - pip install --user -r requirements.txt
+env:
+  - TEST_TAG = "test_generate_deb"
+  - TEST_TAG = "centos6"
+  - TEST_TAG = "centos7"
+script:
+  - pytest -k TEST_TAG
+
+
+
