@@ -5,7 +5,7 @@ import pytest
 import sys
 import tempfile
 
-import testing_tools
+import tests.testing_tools as testing_tools
 import vdist.builder as builder
 import vdist.console_parser as console_parser
 import vdist.configuration as configuration
