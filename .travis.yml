@@ -26,9 +26,10 @@ before_install:
 install:
   - pip install -r requirements.txt
 env:
-  - TEST_TAG="test_generate_deb"
-  - TEST_TAG="centos6"
-  - TEST_TAG="centos7"
+#  - TEST_TAG="test_generate_deb"
+#  - TEST_TAG="centos6"
+#  - TEST_TAG="centos7"
+  - TEST_TAG="test_generate_rpm_from_git_setup_compile_centos7"
 script:
   - pytest -k $TEST_TAG
 
