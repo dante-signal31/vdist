@@ -6,6 +6,8 @@ PYTHON_BASEDIR="{{python_basedir}}"
 set -e
 
 {% if build_deps %}
+# Refresh repositories list to avoid problems with too old databases.
+apt-get update
 # Install build dependencies.
 apt-get install -y {{build_deps|join(' ')}}
 {% endif %}

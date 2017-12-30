@@ -5,7 +5,10 @@ PYTHON_BASEDIR="{{python_basedir}}"
 # Fail on error
 set -e
 
+
 {% if build_deps %}
+# Refresh repositories list to avoid problems with too old databases.
+yum update
 # Install build dependencies.
 yum install -y {{build_deps|join(' ')}}
 {% endif %}
