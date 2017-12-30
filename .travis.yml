@@ -1,7 +1,9 @@
 language: python
 dist: trusty
 # We are going to need a full-VM.
-sudo: true
+sudo: enabled
+services:
+  - docker
 python:
   - 2.7
   - 3.6
