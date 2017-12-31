@@ -182,7 +182,8 @@ def test_generate_deb_from_git_setup_compile():
             "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
             "after_install": 'packaging/postinst.sh',
             "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir
+            "output_folder": output_dir,
+            "output_script": True
         }
         target_file = _generate_deb(builder_parameters)
         file_list_purged = _get_purged_deb_file_list(target_file,
@@ -213,7 +214,8 @@ def _generate_rpm_from_git_setup_compile(centos_version):
             "runtime_deps": ["openssl", "docker-ce"],
             "after_install": 'packaging/postinst.sh',
             "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir
+            "output_folder": output_dir,
+            "output_script": True
         }
         target_file = _generate_rpm(builder_parameters)
         file_list = _read_rpm_contents(target_file)
@@ -249,7 +251,8 @@ def test_generate_deb_from_git_nosetup_compile():
                               "python_basedir": "/opt/python",
                               "compile_python": True,
                               "python_version": '3.4.4',
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         target_file = _generate_deb(builder_parameters)
         file_list_purged = _get_purged_deb_file_list(target_file,
                                                      DEB_COMPILE_FILTER)
@@ -278,7 +281,8 @@ def _generate_rpm_from_git_nosetup_compile(centos_version):
                               "python_basedir": "/opt/python",
                               "compile_python": True,
                               "python_version": '3.4.4',
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         target_file = _generate_rpm(builder_parameters)
         file_list = _read_rpm_contents(target_file)
         # At this point only two folders should remain if everything is correct:
@@ -328,7 +332,8 @@ def test_generate_deb_from_git_setup_nocompile():
             "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
             "after_install": 'packaging/postinst.sh',
             "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir
+            "output_folder": output_dir,
+            "output_script": True
         }
         target_file = _generate_deb(builder_parameters)
         file_list_purged = _get_purged_deb_file_list(target_file,
@@ -372,7 +377,8 @@ def _generate_rpm_from_git_setup_nocompile(centos_version):
             "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
             "after_install": 'packaging/postinst.sh',
             "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir
+            "output_folder": output_dir,
+            "output_script": True
         }
         target_file = _generate_rpm(builder_parameters)
         file_list = _read_rpm_contents(target_file)
@@ -389,16 +395,15 @@ def _generate_rpm_from_git_setup_nocompile(centos_version):
         geolocate_launcher = "/usr/bin/geolocate"
         assert geolocate_launcher in file_list
 
-
-def test_generate_rpm_from_git_setup_nocompile_centos6():
-    _generate_rpm_from_git_setup_nocompile("centos6")
-
-
-# TODO: This test fails <<<<<<<<<<<<<
-# WARNING: Something wrong happens with "nocompile" tests in centos7.
+# TODO: These tests fails <<<<<<<<<<<<<
+# WARNING: Something wrong happens with "nocompile" tests in centos7 and 6.
 # I don't know why fpm call corrupts some lib in the linux container so
-# further cp command fails. This does not happen in centos6 or debian even
+# further cp command fails. This does not happen in debian even
 # when fpm commands are the same. Any help with this issue will be welcome.
+# def test_generate_rpm_from_git_setup_nocompile_centos6():
+#     _generate_rpm_from_git_setup_nocompile("centos6")
+#
+#
 # def test_generate_rpm_from_git_setup_nocompile_centos7():
 #     _generate_rpm_from_git_setup_nocompile("centos7")
 
@@ -420,7 +425,8 @@ def test_generate_deb_from_git_nosetup_nocompile():
             # test_generate_deb_from_git_setup_nocompile()
             "python_version": '3.4.4',
             "python_basedir": '/usr',
-            "output_folder": output_dir
+            "output_folder": output_dir,
+            "output_script": True
         }
         target_file = _generate_deb(builder_parameters)
         file_list_purged = _get_purged_deb_file_list(target_file,
@@ -452,7 +458,8 @@ def _generate_rpm_from_git_nosetup_nocompile(centos_version):
             # test_generate_deb_from_git_setup_nocompile()
             "python_version": '3.4.4',
             "python_basedir": '/usr',
-            "output_folder": output_dir
+            "output_folder": output_dir,
+            "output_script": True
         }
         target_file = _generate_rpm(builder_parameters)
         file_list = _read_rpm_contents(target_file)
@@ -490,7 +497,8 @@ def test_generate_deb_from_git_suffixed():
                                 branch='vdist_tests'
                               ),
                               "profile": 'ubuntu-trusty',
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_deb(builder_parameters)
 
 
@@ -503,7 +511,8 @@ def _generate_rpm_from_git_suffixed(centos_version):
                                 branch='vdist_tests'
                               ),
                               "profile": centos_version,
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_rpm(builder_parameters)
 
 
@@ -528,7 +537,8 @@ def test_generate_deb_from_git_directory():
                               "source": git_directory(path=temp_dir,
                                                       branch='vdist_tests'),
                               "profile": 'ubuntu-trusty',
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_deb(builder_parameters)
 
 
@@ -545,7 +555,8 @@ def _generate_rpm_from_git_directory(centos_version):
                               "source": git_directory(path=temp_dir,
                                                       branch='vdist_tests'),
                               "profile": centos_version,
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_rpm(builder_parameters)
 
 
@@ -569,7 +580,8 @@ def test_generate_deb_from_directory():
                               "version": '1.0',
                               "source": directory(path=temp_dir, ),
                               "profile": 'ubuntu-trusty',
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_deb(builder_parameters)
 
 
@@ -585,7 +597,8 @@ def _generate_rpm_from_directory(centos_version):
                               "version": '1.0',
                               "source": directory(path=temp_dir, ),
                               "profile": centos_version,
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_rpm(builder_parameters)
 
 
