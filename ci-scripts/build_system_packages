@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+
+APT_SOURCES_FILEPATH = "/etc/apt/sources.list"
+BINTRAY_VDIST_CONFIG_STRING = "deb [trusted=yes] " \
+                              "https://dl.bintray.com/dante-signal31/deb " \
+                              "generic main\n"
+
+
+def install_dependencies()-> None:
+    print("Installing dependencies for Bintray...")
+    _run_console_command("sudo apt-get update")
+    _run_console_command("sudo apt-get install apt-transport-https")
+    print("Dependencies for Bintray installed.")
+
+
+def _run_console_command(command: str)-> None:
+    subprocess.run(command, shell=True, check=True)
+
+
+def install_bintray_key()-> None:
+    print("Adding Bintray pgp key...")
+    _run_console_command("sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 379CE192D401AB61")
+    print("Bintray pgp key added.")
+
+
+def check_bintray_in_apt_sources()-> None:
+    if _included_in_apt_sources(BINTRAY_VDIST_CONFIG_STRING):
+        print("Bintray already in apt sources list.")
+    else:
+        print("Bintray not in apt sources list. Including it...")
+        _include_apt_source(BINTRAY_VDIST_CONFIG_STRING)
+        print("Bintray is now included in apt sources list.")
+
+
+def _included_in_apt_sources(source_url: str,
+                             apt_filepath: str=APT_SOURCES_FILEPATH)-> bool:
+    with open(apt_filepath, mode="r") as apt_file:
+        return True if source_url in apt_file else False
+
+
+def _include_apt_source(source_url: str,
+                        apt_filepath: str=APT_SOURCES_FILEPATH)-> bool:
+    with open(apt_filepath, mode="a") as apt_file:
+        bintray_source_entry = "\n\n{0}".format(source_url)
+        apt_file.write(bintray_source_entry)
+
+
+def install_vdist()-> None:
+    print("Installing vdis package from Bintray...")
+    _run_console_command("sudo apt-get update")
+    _run_console_command("sudo apt-get install vdist")
+    print("vdist installed.")
+
+
+def build_packages()-> None:
+    print("About to run building command from {0}".format(os.getcwd()))
+    print("Building system packages...")
+    _run_console_command("vdist batch packaging/vdist_build.cnf")
+    print("System packages built.")
+
+
+if __name__ == '__main__':
+    install_dependencies()
+    install_bintray_key()
+    check_bintray_in_apt_sources()
+    install_vdist()
+    build_packages()
+
