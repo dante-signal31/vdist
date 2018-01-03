@@ -104,7 +104,8 @@ def test_generate_deb_from_git():
                                   branch='vdist_tests'
                               ),
                               "profile": 'ubuntu-trusty',
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_deb(builder_parameters)
 
 
@@ -117,7 +118,8 @@ def _generate_rpm_from_git(centos_version):
                                   branch='vdist_tests'
                               ),
                               "profile": centos_version,
-                              "output_folder": output_dir}
+                              "output_folder": output_dir,
+                              "output_script": True}
         _ = _generate_rpm(builder_parameters)
 
 
