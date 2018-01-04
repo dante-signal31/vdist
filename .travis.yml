@@ -31,7 +31,7 @@ env:
   - TEST_TAG="centos6"
   - TEST_TAG="centos7"
 script:
-  - pytest -v -rs -k $TEST_TAG
+  - travis_wait 20 pytest -v -rs -k $TEST_TAG
 #after_sucess:
 #  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; ci-scripts/build_system_packages; fi
 
