@@ -38,9 +38,10 @@ matrix:
   - python: nightly
 script:
   # Seems that centos7 tests fail if I don't give them additional time.
-  - if [[ $TEST_TAG == "centos7" ]]; then travis_wait 20 pytest -v -rs -k $TEST_TAG; else pytest -v -rs -k $TEST_TAG; fi
+  #- if [[ $TEST_TAG == "centos7" ]]; then travis_wait 20 pytest -v -rs -k $TEST_TAG; else pytest -v -rs -k $TEST_TAG; fi
+  - ci_scripts/run_tests
 #after_sucess:
-#  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; ci-scripts/build_system_packages; fi
+#  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; ci_scripts/build_system_packages; fi
 
 
 
