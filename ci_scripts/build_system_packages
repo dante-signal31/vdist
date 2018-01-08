@@ -13,20 +13,20 @@ BINTRAY_VDIST_CONFIG_STRING = "deb [trusted=yes] " \
                               "generic main\n"
 
 
-def install_dependencies()-> None:
+def install_dependencies():
     print("Installing dependencies for Bintray...")
     tools.run_console_command("sudo apt-get update")
     tools.run_console_command("sudo apt-get install apt-transport-https")
     print("Dependencies for Bintray installed.")
 
 
-def install_bintray_key()-> None:
+def install_bintray_key():
     print("Adding Bintray pgp key...")
     tools.run_console_command("sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 379CE192D401AB61")
     print("Bintray pgp key added.")
 
 
-def check_bintray_in_apt_sources()-> None:
+def check_bintray_in_apt_sources():
     if _included_in_apt_sources(BINTRAY_VDIST_CONFIG_STRING):
         print("Bintray already in apt sources list.")
     else:
@@ -35,27 +35,27 @@ def check_bintray_in_apt_sources()-> None:
         print("Bintray is now included in apt sources list.")
 
 
-def _included_in_apt_sources(source_url: str,
-                             apt_filepath: str=APT_SOURCES_FILEPATH)-> bool:
+def _included_in_apt_sources(source_url,
+                             apt_filepath=APT_SOURCES_FILEPATH):
     with open(apt_filepath, mode="r") as apt_file:
         return True if source_url in apt_file else False
 
 
-def _include_apt_source(source_url: str,
-                        apt_filepath: str=APT_SOURCES_FILEPATH)-> bool:
+def _include_apt_source(source_url,
+                        apt_filepath=APT_SOURCES_FILEPATH):
     with open(apt_filepath, mode="a") as apt_file:
         bintray_source_entry = "\n\n{0}".format(source_url)
         apt_file.write(bintray_source_entry)
 
 
-def install_vdist()-> None:
+def install_vdist():
     print("Installing vdis package from Bintray...")
     tools.run_console_command("sudo apt-get update")
     tools.run_console_command("sudo apt-get install vdist")
     print("vdist installed.")
 
 
-def build_packages()-> None:
+def build_packages():
     print("About to run building command from {0}".format(os.getcwd()))
     print("Building system packages...")
     tools.run_console_command("vdist batch packaging/vdist_build.cnf")

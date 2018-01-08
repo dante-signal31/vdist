@@ -8,7 +8,7 @@ else:
     from ci_scripts import ci_tools as tools
 
 
-def _get_test_command()-> str:
+def _get_test_command():
     prefix = "travis_wait 30 " if current_test_suite == "centos7" else ""
     cmd = "{0}pytest -v -rs -k {1}".format(prefix, current_test_suite)
     return cmd
