@@ -1,6 +1,10 @@
 # Common functions used by ci scripts.
+import sys
 import subprocess
 
 
 def run_console_command(command):
-    subprocess.run(command, shell=True, check=True)
+    if sys.version.major < 3:
+        subprocess.call(command, shell=True)
+    else:
+        subprocess.run(command, shell=True, check=True)
