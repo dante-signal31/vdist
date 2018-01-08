@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 import os
-from ci_scripts import ci_tools as tools
+import sys
+if sys.version_info[0] >= 3:
+    from ci_scripts import ci_tools as tools
+else:
+    import ci_tools as tools
 
 APT_SOURCES_FILEPATH = "/etc/apt/sources.list"
 BINTRAY_VDIST_CONFIG_STRING = "deb [trusted=yes] " \

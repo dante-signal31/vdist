@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
 import os
-from ci_scripts import ci_tools as tools
+import sys
+if sys.version_info[0] >= 3:
+    from ci_scripts import ci_tools as tools
+else:
+    import ci_tools as tools
 
 
 def _get_test_command()-> str:
-    prefix = "travis_wait 25 " if current_test_suite == "centos7" else ""
+    prefix = "travis_wait 30 " if current_test_suite == "centos7" else ""
     cmd = "{0}pytest -v -rs -k {1}".format(prefix, current_test_suite)
     return cmd
 
