@@ -11,7 +11,19 @@ APT_SOURCES_FILEPATH = "/etc/apt/sources.list"
 BINTRAY_VDIST_CONFIG_STRING = "deb [trusted=yes] " \
                               "https://dl.bintray.com/dante-signal31/deb " \
                               "generic main\n"
+BUILD_INTERPRETER = "3.6"
+BUILD_TEST_TAG = "test_generate_deb"
 
+
+def get_current_interpreter_version():
+    version_string = "{0}.{1}".format(sys.version_info.major,
+                                      sys.version_info.minor)
+    return version_string
+
+
+def get_current_tag():
+    current_tag = os.getenv("TEST_TAG")
+    return current_tag
 
 def install_dependencies():
     print("Installing dependencies for Bintray...")
@@ -63,9 +75,14 @@ def build_packages():
 
 
 if __name__ == '__main__':
-    install_dependencies()
-    install_bintray_key()
-    check_bintray_in_apt_sources()
-    install_vdist()
-    build_packages()
+    if get_current_interpreter_version() == BUILD_INTERPRETER \
+            and get_current_tag() == BUILD_TEST_TAG:
+        print("This job is going to build vdist system packages.")
+        install_dependencies()
+        install_bintray_key()
+        check_bintray_in_apt_sources()
+        install_vdist()
+        build_packages()
+    else:
+        print("This job does not meet conditions to build vdist system packages.")
 
