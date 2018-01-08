@@ -1,6 +1,6 @@
 language: python
 dist: trusty
-# We are going to need a full-VM.
+# We are going to need a full-VM to run docker containers inside.
 sudo: enabled
 # Vdist needs docker enabled to work.
 services:
@@ -30,6 +30,12 @@ env:
   - TEST_TAG="test_generate_deb"
   - TEST_TAG="centos6"
   - TEST_TAG="centos7"
+matrix:
+  allow_failures:
+  # Actually I only build with latest stable python release, but I want
+  # to be aware in advance if any dev python version is going to crash
+  # my future builds.
+  - python: nightly
 script:
   # Seems that centos7 tests fail if I don't give them additional time.
   - if [[ $TEST_TAG == "centos7" ]]; travis_wait 20 pytest -v -rs -k $TEST_TAG; else; pytest -v -rs -k $TEST_TAG; fi;
