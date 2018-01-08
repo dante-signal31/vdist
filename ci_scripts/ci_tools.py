@@ -2,5 +2,5 @@
 import subprocess
 
 
-def run_console_command(command: str)-> None:
+def run_console_command(command):
     subprocess.run(command, shell=True, check=True)
