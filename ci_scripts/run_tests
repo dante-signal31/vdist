@@ -2,10 +2,10 @@
 
 import os
 import sys
-if sys.version_info[0] >= 3:
-    from ci_scripts import ci_tools as tools
-else:
+if sys.version_info.major < 3:
     import ci_tools as tools
+else:
+    from ci_scripts import ci_tools as tools
 
 
 def _get_test_command()-> str:
