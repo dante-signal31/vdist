@@ -85,4 +85,5 @@ if __name__ == '__main__':
         build_packages()
     else:
         print("This job does not meet conditions to build vdist system packages.")
+        print("Current test tag: {}".format(get_current_tag()))
 

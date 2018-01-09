@@ -41,7 +41,10 @@ script:
   # Seems that centos7 tests fail if I don't give them additional time.
   - if [[ $TEST_TAG == "centos7" ]]; then travis_wait 25 pytest -v -rs -k $TEST_TAG; else pytest -v -rs -k $TEST_TAG; fi
   - sudo ci_scripts/build_system_packages
-#after_sucess:
+after_sucess:
+  - sucess=true
+after_failure:
+  - sucess=false
 #  - ci_scripts/build_system_packages
 ##  - packaging/pip_package
 deploy:
@@ -57,7 +60,7 @@ deploy:
       # and put staging.
       branch: travis_integration
       python: 3.6
-      condition: "$TEST_TAG == test_generate_deb"
+      condition: "$sucess = true"
   # Python Package Index.
   - provider: pypi
     user:
@@ -70,4 +73,4 @@ deploy:
       # and put staging.
       branch: travis_integration
       python: 3.6
-      condition: "$TEST_TAG == test_generate_deb"
+      condition: "$sucess = true"
