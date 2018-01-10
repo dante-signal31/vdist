@@ -61,8 +61,9 @@ def _include_apt_source(source_url,
 
 
 def install_vdist():
-    print("Installing vdis package from Bintray...")
+    print("Installing vdist package from Bintray...")
     tools.run_console_command("sudo apt-get update")
+    # [TODO] Travis VM cannot find docker.io when it tries to install it as vdist dependencies. Fix it.
     tools.run_console_command("sudo apt-get install vdist")
     print("vdist installed.")
 
