@@ -14,9 +14,9 @@ services:
 # TEST MATRIX
 ################################
 python:
-- 2.7
+#- 2.7
 - 3.6
-- nightly
+#- nightly
 env:
   matrix:
   - TEST_TAG="test_generate_deb"
@@ -73,6 +73,7 @@ jobs:
   # Upload packages to Python Package Index
   - stage: Pypi deployment
     python: 3.6
+    script: echo "Deploying to Python Package Index..."
     deploy:
     - provider: pypi
       user:
@@ -80,6 +81,8 @@ jobs:
       password:
         secure: "X7LVEIqj77L8N8ZRY4rPyQunL44GqnzwCdvXF8n03OUIC+U4WVC5QXMdcZ8PnJBJHxI1jQuascZGBT4+xO97sMWlCFZxHGLDkWTJkp3fqxIaO5BjpGEl3Ofl1qAHMhchknRdko18bFiE6sm/PLbg66rspBlepSGsGLf/3j9DIMIx9voWD5VnspBFLnhMEUmtyjrk+ORIR0O7mXPrgEkyZGdGRly4Tuo8jTg0v7LbskkkNDJDYtwfiGLkDSK0+5TuMiLuzo4Zf3pe2+clTvqzN+xx/2mW5w46/bYNNTqoFRPwN3X2MGCddnR07Njo4XHTaI+6gXh1/Dwax5Q/zsf8IrSNS9yBbco5eQx/0FlZuVzIFxPsWJbd90V0a5914zP3U3rJoWMULCje/dBW06atDEvCojMOXBiLmtAd3kbXdifrzcO+CPjBI8SaBaSRC48szRUeIoRkSKLzGz/c/wehU7BfV/8UQZ4ds+XCYfnKCzA66pzwOnSOXeRnV3EJAcugZhpY6trohKzFZxEECBhYu3DZXV49vZChWtKWUoc+WznDAR36wFlvOLMA4eZV4CVgSnNnqd26iaSLOYGNDbT956Z98mzV4MmAAuqAlaEWoj12c5qWOBd9N2wayCKd1YsPbZ+sdBwPht5MKJy8Nf61zF3LgABXndY0pITSdxEkRk0="
       distributions: "sdist bdist_wheel"
+      on:
+        branch: travis_integration
   # Build DEB and RPM packages and upload them to Github.
   - stage: System packages deployment
     python: 3.6
