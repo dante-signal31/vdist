@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 
-# [TODO] ci_scripts and test is wrongly included in package. I have to fix it.
 setup(
     name='vdist',
     version='1.2.1',
