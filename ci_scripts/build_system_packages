@@ -30,6 +30,9 @@ def install_dependencies():
     tools.run_console_command("sudo apt-get update")
     tools.run_console_command("sudo apt-get install apt-transport-https")
     print("Dependencies for Bintray installed.")
+    print("Installing docker...")
+    tools.run_console_command("sudo apt-get install apt-transport-https")
+    print("Docker installed")
 
 
 def install_bintray_key():
@@ -63,7 +66,6 @@ def _include_apt_source(source_url,
 def install_vdist():
     print("Installing vdist package from Bintray...")
     tools.run_console_command("sudo apt-get update")
-    # [TODO] Travis VM cannot find docker.io when it tries to install it as vdist dependencies. Fix it.
     tools.run_console_command("sudo apt-get install vdist")
     print("vdist installed.")
 
