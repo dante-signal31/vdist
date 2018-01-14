@@ -1,8 +1,11 @@
 from setuptools import setup, find_packages
+import ci_scripts.ci_tools as tools
 
 setup(
     name='vdist',
-    version='1.2.3',
+    # Version is set in packaging/vdist_build.cnf and returned through
+    # tools.get_current_version().
+    version=tools.get_current_version(),
     description='Create OS packages from Python '
                 'projects using Docker containers',
     long_description='Create OS packages from Python '

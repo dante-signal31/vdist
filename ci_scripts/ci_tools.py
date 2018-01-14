@@ -1,6 +1,26 @@
 # Common functions used by ci scripts.
 import sys
 import subprocess
+if sys.version_info.major < 3:
+    import ConfigParser as configparser
+else:
+    import configparser
+
+
+def get_current_version(configuration_file):
+    parser = _get_config_parser()
+    parser.read(configuration_file)
+    version = parser["DEFAULT"]["version"]
+    return version
+
+
+def _get_config_parser():
+    if sys.version_info[0] == 3:
+        parser = configparser.ConfigParser(
+            interpolation=configparser.ExtendedInterpolation())
+    else:
+        parser = configparser.ConfigParser()
+    return parser
 
 
 def run_console_command(command):
