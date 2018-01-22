@@ -89,9 +89,9 @@ jobs:
     # [TODO] Try to remove TEST_TAG set here and from build_system_packages.
     env: TEST_TAG="test_generate_deb"
     script:
-    - sudo ci_scripts/build_system_packages
+    - travis_wait 20 sudo ci_scripts/build_system_packages
     before_deploy:
-    - travis_wait 20 ci_scripts/tag_release
+    - ci_scripts/tag_release
     deploy:
     # Github Releases.
     - provider: releases

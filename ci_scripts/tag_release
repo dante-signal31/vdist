@@ -14,16 +14,20 @@ VERSION_PREFIX = "v"
 
 
 def set_contact_data(username, email):
+    print("Setting user and email for current commit...")
     tools.run_console_command(
         "git config --local user.name '{0}'".format(username))
     tools.run_console_command(
         "git config --local user.email '{0}'".format(email))
+    print("User and email set.")
 
 
 def set_version_tag(prefix):
+    print("Setting tag for current commit...")
     version = tools.get_current_version(VDIST_CONFIGURATION)
     version_string = "{0}{1}".format(prefix, version)
     tools.run_console_command("git tag '{0}'".format(version_string))
+    print("Tag set.")
 
 
 if __name__ == '__main__':
