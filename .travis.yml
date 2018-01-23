@@ -86,8 +86,11 @@ jobs:
   # Build DEB and RPM packages and upload them to Github.
   - stage: System packages deployment
     python: 3.6
-    # [TODO] Try to remove TEST_TAG set here and from build_system_packages.
-    env: TEST_TAG="test_generate_deb"
+    branches:
+      only:
+        - travis_integration
+#    # [TODO] Try to remove TEST_TAG set here and from build_system_packages.
+#    env: TEST_TAG="test_generate_deb"
     script:
     - travis_wait 20 sudo ci_scripts/build_system_packages
     before_deploy:
@@ -100,5 +103,5 @@ jobs:
       file_glob: true
       file: package_dist/*
       skip_cleanup: true
-      on:
-        branch: travis_integration
+#      on:
+#        branch: travis_integration
