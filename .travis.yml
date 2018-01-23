@@ -18,10 +18,10 @@ python:
 - 3.6
 #- nightly
 env:
-#  matrix:
-  - TEST_TAG="test_generate_deb"
+ matrix:
+ - TEST_TAG="test_generate_deb"
 #  - TEST_TAG="centos6"
-  - TEST_TAG="centos7"
+ - TEST_TAG="centos7"
 matrix:
   allow_failures:
   # Actually I only build with latest stable python release, but I want
