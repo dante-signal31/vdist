@@ -18,7 +18,7 @@ python:
 - 3.6
 #- nightly
 env:
-  matrix:
+#  matrix:
   - TEST_TAG="test_generate_deb"
 #  - TEST_TAG="centos6"
 #  - TEST_TAG="centos7"
@@ -62,7 +62,7 @@ install:
 - pip install -r requirements.txt
 script:
   # Seems that centos7 tests fail if I don't give them additional time.
-  - if [[ $TEST_TAG == "centos7" ]]; then travis_wait 30 pytest -v -rs -k $TEST_TAG; else pytest -v -rs -k $TEST_TAG; fi
+  - if [[ $TEST_TAG = "centos7" ]]; then travis_wait 30 pytest -v -rs -k $TEST_TAG; else pytest -v -rs -k $TEST_TAG; fi
 
 
 ################################
