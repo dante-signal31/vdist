@@ -98,8 +98,7 @@ jobs:
       api_key:
         secure: "B+nKpJMdEL2F6Ly6zH/6D3iuHNVodJpFa6nDsUMGOJAOVlJFjuZA6+natEMm7QZudZYFxyhidil86UsKtyM0qEP9LzzF3861npLCeD6FQrmLJabj5TxfLldE1W7ZEXLr2tSWkysN3y3pGKSWZMQa74vfvo7PI6y02afJ9B3OQfDJx9jpwvFiXHwTLtkXzKR/P+WvjAvb/HrETjnaYhy5a7GSAXQPI6dtheGUiPUIaozJJS6sSX+h5Ro4FCwNilQM86vs1vLJpcjtMPssVwBM41fHhxqJxLI1QAivqHXCuR0TLdx6AyRYRG5Fcgyyok2WTXgzTRwA/n27PnkaPQOhKiyChR0kZs2jpQ/U+gf2QEElbQlRRLkEWNSV3s8TpOVSs+vWmDb/AI/HUYtbiJTZCclo+jh+S4bOkqWbbdhOauI5xdrYlopRWRwT7FbYqNONor0jSMsLnhGUMOXEsq0v6f2FoCKQBFgSjddoztLBkqa8PqOcnn7b0yVk09UwLDNJENjD4BLK2wI5W9Z2RC0pxsf6RJ4QMBfJ8ONEm8GSytEQZDOZHkqkh79dzadNufwJ41k5XHEXLtTMRGFgOAE/fl+A6OZJUxN6l/mBh9mkdIqDoFvZZRMh5ogodh04btv45mUWQUOuOgnCOzwP46Mn/poQ19akSYh6pibsYhgAk4k="
       file_glob: true
-      file: package_dist/*.*
+      file: package_dist/*
       skip_cleanup: true
       on:
-#        tags: true
-        all_branches: true
+        branch: travis_integration
