@@ -35,7 +35,7 @@ matrix:
 ################################
 branches:
   only:
-  - staging
+#  - staging
   # [TODO] Just for tests of travis_integration. Remove when integration is done.
   - travis_integration
 
@@ -86,9 +86,7 @@ jobs:
   # Build DEB and RPM packages and upload them to Github.
   - stage: System packages deployment
     python: 3.6
-    branches:
-      only:
-        - travis_integration
+    if: branch = travis_integration
 #    # [TODO] Try to remove TEST_TAG set here and from build_system_packages.
 #    env: TEST_TAG="test_generate_deb"
     script:
@@ -103,5 +101,5 @@ jobs:
       file_glob: true
       file: package_dist/*
       skip_cleanup: true
-#      on:
-#        branch: travis_integration
+      on:
+        all_branches: true
