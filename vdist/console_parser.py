@@ -36,6 +36,8 @@ def parse_arguments(args=None):
                                      default=None,
                                      type=_check_is_file,
                                      metavar="CONFIGURATION FILENAME")
+    # [TODO] Console does not get output_script right when entered from console
+    # in batch mode.
     automatic_subparser.add_argument("--output_script",
                                      required=False,
                                      help="Copy build script in output folder.",

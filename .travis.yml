@@ -90,6 +90,7 @@ jobs:
 #    # [TODO] Try to remove TEST_TAG set here and from build_system_packages.
 #    env: TEST_TAG="test_generate_deb"
     script:
+    - echo "We are at branch: $TRAVIS_BRANCH"
     - travis_wait 20 sudo ci_scripts/build_system_packages
     before_deploy:
     - ci_scripts/tag_release
