@@ -54,10 +54,10 @@ notifications:
 # TESTING
 ################################
 before_install:
-  - sudo apt-get update -qq
-  # To test we need docker.io but that comes already packaged in travis image
-  # so we don't need to install it.
-  - sudo apt-get install -qq libssl1.0.0 rpm
+#  - sudo apt-get update -qq
+#  # To test we need docker.io but that comes already packaged in travis image
+#  # so we don't need to install it.
+#  - sudo apt-get install -qq libssl1.0.0 rpm
 install:
 - pip install -r requirements.txt
 script:
@@ -93,6 +93,7 @@ jobs:
     script:
     - echo $TRAVIS_BRANCH
     - git branch --list
+    - cat vdist/profiles/internal_profiles.json
 #    - travis_wait 20 sudo ci_scripts/build_system_packages
 #    before_deploy:
 #    - ci_scripts/tag_release
