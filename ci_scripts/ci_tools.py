@@ -10,7 +10,7 @@ else:
 def get_current_version(configuration_file):
     parser = _get_config_parser()
     parser.read(configuration_file)
-    version = parser["DEFAULT"]["version"]
+    version = _get_version(parser)
     return version
 
 
@@ -21,6 +21,14 @@ def _get_config_parser():
     else:
         parser = configparser.ConfigParser()
     return parser
+
+
+def _get_version(parser):
+    if sys.version_info[0] == 3:
+        version = parser["DEFAULT"]["version"]
+    else:
+        version = parser.get("DEFAULT", "version")
+    return version
 
 
 def run_console_command(command):
