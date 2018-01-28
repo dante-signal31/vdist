@@ -92,6 +92,7 @@ jobs:
 #    env: TEST_TAG="test_generate_deb"
     script:
     - echo $TRAVIS_BRANCH
+    - git branch --list
 #    - travis_wait 20 sudo ci_scripts/build_system_packages
 #    before_deploy:
 #    - ci_scripts/tag_release
