@@ -53,14 +53,14 @@ notifications:
 ################################
 # TESTING
 ################################
-before_install:
+#before_install:
 #  - sudo apt-get update -qq
 #  # To test we need docker.io but that comes already packaged in travis image
 #  # so we don't need to install it.
 #  - sudo apt-get install -qq libssl1.0.0 rpm
-install:
+#install:
 #  - pip install -r requirements.txt
-script:
+#script:
 #  # Seems that centos7 tests fail if I don't give them additional time.
 #  - if [[ $TEST_TAG = "centos7" ]]; then travis_wait 30 pytest -v -rs -k $TEST_TAG; else pytest -v -rs -k $TEST_TAG; fi
 
