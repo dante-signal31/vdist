@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+
+import argparse
+import sys
+if sys.version_info.major < 3:
+    import ci_tools as tools
+else:
+    from ci_scripts import ci_tools as tools
+
+DEBUG_COMMAND = "curl -s -X POST -H \"Content-Type: application/json\"-H \"" \
+                "Accept: application/json\" -H \"Travis-API-Version: 3\" -H " \
+                "\"Authorization: token {token}\" -d \"{{\"quiet\": true}}\" " \
+                "https://api.travis-ci.org/job/{id}/debug"
+
+
+def launch_debug_build(api_token, build_number):
+    command = DEBUG_COMMAND.format(token=api_token, id=build_number)
+    tools.run_console_command(command)
+
+
+def parse_arguments(args=None):
+    arg_parser = argparse.ArgumentParser(description="Tool to activate a debug "
+                                                     "session on Travis.\n",
+                                         epilog="<dante.signal31@gmail.com>")
+    arg_parser.add_argument("api_token",
+                            default=None,
+                            metavar="API_TOKEN")
+    arg_parser.add_argument("build_number",
+                            default=None,
+                            type=int,
+                            metavar="BUILD_ID")
+    parsed_arguments = vars(arg_parser.parse_args(args))
+    filtered_parser_arguments = {key: value for key, value in parsed_arguments.items()
+                                 if value is not None}
+    return filtered_parser_arguments
+
+
+def main(args=sys.argv[1:]):
+    console_arguments = parse_arguments(args)
+    launch_debug_build(**console_arguments)
+
+
+if __name__ == '__main__':
+    main()
