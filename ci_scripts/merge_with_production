@@ -6,14 +6,16 @@ import tempfile
 
 if sys.version_info.major < 3:
     import ci_tools as tools
+    from .ci_constants import *
 else:
     from ci_scripts import ci_tools as tools
+    from ci_scripts.ci_constants import *
 
-BRANCH_TO_MERGE_INTO = "test_production"
-BRANCH_TO_MERGE = "travis_integration"
-GITHUB_URL = "https://github.com/"
-GITHUB_REPO = "dante-signal31/vdist.git"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+# BRANCH_TO_MERGE_INTO = "test_production"
+# BRANCH_TO_MERGE = "travis_integration"
+# GITHUB_URL = "https://github.com/"
+# GITHUB_REPO = "dante-signal31/vdist.git"
+# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def clone_repository(tempdir, url=GITHUB_URL, repo=GITHUB_REPO):
@@ -33,11 +35,13 @@ def merge_with_production(tempdir,
 
 def push_to_origin(github_repo=GITHUB_REPO, github_token=GITHUB_TOKEN,
                    branch_to_merge_into=BRANCH_TO_MERGE_INTO):
+    print("Pushing changes...")
     push_uri = "https://{token}@github.com/{repo}".format(token=github_token,
                                                           repo=github_repo)
     # Redirect to /dev/null to avoid secret leakage
     tools.run_console_command("git push {uri} {branch} > /dev/null 2>&1".format(uri=push_uri,
                                                                                 branch=branch_to_merge_into))
+    print("Pushed.")
 
 
 if __name__ == '__main__':
