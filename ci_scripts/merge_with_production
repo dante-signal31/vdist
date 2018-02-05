@@ -11,8 +11,6 @@ else:
 
 BRANCH_TO_MERGE_INTO = "test_production"
 BRANCH_TO_MERGE = "travis_integration"
-# GIT_COMMITTER_EMAIL = "dante.signal31@gmail.com"
-# GIT_COMMITTER_NAME = "dante-signal31"
 GITHUB_URL = "https://github.com/"
 GITHUB_REPO = "dante-signal31/vdist.git"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
