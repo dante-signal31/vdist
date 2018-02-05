@@ -74,7 +74,7 @@ script:
 ################################
 jobs:
   include:
-  - stage: Branch merge to production
+  - stage: Branch merge to production branch
     python: 3.6
     if: branch = travis_integration
     script:
