@@ -78,7 +78,7 @@ jobs:
     python: 3.6
     if: branch = travis_integration
     script:
-    - sudo ci_scripts/merge_with_production
+    - ci_scripts/merge_with_production
 #  # Upload packages to Python Package Index
 #  - stage: Pypi deployment
 #    python: 3.6
