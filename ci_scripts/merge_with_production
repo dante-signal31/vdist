@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import tempfile
+
+if sys.version_info.major < 3:
+    import ci_tools as tools
+else:
+    from ci_scripts import ci_tools as tools
+
+BRANCH_TO_MERGE_INTO = "test_production"
+BRANCH_TO_MERGE = "travis_integration"
+# GIT_COMMITTER_EMAIL = "dante.signal31@gmail.com"
+# GIT_COMMITTER_NAME = "dante-signal31"
+GITHUB_URL = "https://github.com/"
+GITHUB_REPO = "dante-signal31/vdist.git"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+
+def clone_repository(tempdir, url=GITHUB_URL, repo=GITHUB_REPO):
+    tools.run_console_command("git clone {url}{repo} {dir}".format(url=url,
+                                                                   repo=repo,
+                                                                   dir=tempdir))
+
+
+def merge_with_production(tempdir,
+                          branch_to_merge=BRANCH_TO_MERGE,
+                          branch_to_merge_into=BRANCH_TO_MERGE_INTO):
+    os.chdir(tempdir)
+    tools.run_console_command("git checkout {branch}".format(branch=branch_to_merge_into))
+    tools.run_console_command("git merge --ff-only origin/{branch}".format(branch=branch_to_merge))
+
+
+def push_to_origin(github_repo=GITHUB_REPO, github_token=GITHUB_TOKEN,
+                   branch_to_merge_into=BRANCH_TO_MERGE_INTO):
+    push_uri = "https://{token}@github.com/{repo}".format(token=github_token,
+                                                          repo=github_repo)
+    # Redirect to /dev/null to avoid secret leakage
+    tools.run_console_command("git push {uri} {branch} > /dev/null 2>&1".format(uri=push_uri,
+                                                                                branch=branch_to_merge_into))
+
+
+if __name__ == '__main__':
+    with tempfile.TemporaryDirectory() as tempdir:
+        clone_repository(tempdir)
+        merge_with_production(tempdir)
+        push_to_origin()
