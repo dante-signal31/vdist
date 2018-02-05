@@ -28,7 +28,7 @@ def merge_with_production(tempdir,
     os.chdir(tempdir)
     tools.run_console_command("git checkout {branch}".format(branch=branch_to_merge))
     tools.run_console_command("git checkout {branch}".format(branch=branch_to_merge_into))
-    tools.run_console_command("git merge --ff-only {branch}".format(branch=branch_to_merge))
+    tools.run_console_command("git merge {branch}".format(branch=branch_to_merge))
 
 
 def push_to_origin(github_repo=GITHUB_REPO, github_token=GITHUB_TOKEN,
