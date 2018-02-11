@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import os
 import sys
 import tempfile
 
@@ -10,12 +9,6 @@ if sys.version_info.major < 3:
 else:
     from ci_scripts import ci_tools as tools
     from ci_scripts.ci_constants import *
-
-# BRANCH_TO_MERGE_INTO = "test_production"
-# BRANCH_TO_MERGE = "travis_integration"
-# GITHUB_URL = "https://github.com/"
-# GITHUB_REPO = "dante-signal31/vdist.git"
-# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def clone_repository(tempdir, url=GITHUB_URL, repo=GITHUB_REPO):

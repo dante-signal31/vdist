@@ -11,8 +11,6 @@ APT_SOURCES_FILEPATH = "/etc/apt/sources.list"
 BINTRAY_VDIST_CONFIG_STRING = "deb [trusted=yes] " \
                               "https://dl.bintray.com/dante-signal31/deb " \
                               "generic main\n"
-# BUILD_INTERPRETER = "3.6"
-# BUILD_TEST_TAG = "test_generate_deb"
 
 
 def get_current_interpreter_version():
