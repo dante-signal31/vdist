@@ -14,16 +14,16 @@ services:
 # TEST MATRIX
 ################################
 python:
-- 2.7
+#- 2.7
 - 3.6
-- nightly
+#- nightly
 env:
  global:
  - secure: "Ig3i1GxGTxz+J1LR46cmkkWzpHBUsUVpTVJZ5nyrH6781eoQmZStNfBdmn32MogumbyTnQzUEtWHEdAMErwtmOcCOo0LkrHKYNlJopVA06NwO7+IO8FGpSEydeMYFMsWdEO8Hg2vk/xr+K7UjVcJvG0usPxpEpIE17abif64mnDJXuB3VHchi/0I1BYimnmXVVFh93A+xOdXxbYjnPCDSQQ+f85NqTyMw1aTCkYuqG1XOZBdrO0rGd8McHjdbwLFOmN0Ve6SaollosztA/AgI5VcfsCn4tlSpg6DmY976QWkWchVVQI33vJEYGXiA4VFLzfGJsobQQZHuAieLBsvgj3Lz8OVVItnIPYVOcJ1qDbQP09VZKxFo9zDajJq1169oYSFlOj/0KrHJYEIGHwk+kwBWn6THdnadY8qeko1TEdWfrsgn3gmCUK9njQCA5UJM+7dPTWTE++fSBc0dZqXLV8ooPJ7ZjCMX7BCG0PR9Sr2PRLwOFtGYpWzdu4hIM8r8TBLZfo85LcGwa+mhOtfD+bdxCoYyvsmQzgGpcVWqJc76WuvemHSjmpV08mKu3UHyRPrmUP2yrD700u05kj9G6mpu0ZGzQgq567YaUy/jaQp2esNNhZ4PNdDvKtatUDY7OQ9RXguNKSYNI+b+7IgDdK3vQ4uCBMjDP4F1VEulJ0="
  matrix:
   - TEST_TAG="test_generate_deb"
-  - TEST_TAG="centos6"
-  - TEST_TAG="centos7"
+#  - TEST_TAG="centos6"
+#  - TEST_TAG="centos7"
 matrix:
   allow_failures:
   # Actually I only build with latest stable python release, but I want
@@ -117,6 +117,8 @@ jobs:
       key:
         secure: "Jl2g7M48tRrVpHByvzypDee1g/sE1QkctqgvASDbGpxr4ku5llGXSltkNJv3mIBpvqdSCO4YNM3f7bS644hy5Oxng6cyonw8sdRyCnIjk+ruFAYtXfrl3N6LODsXWH8XTsDSoSNq1wSQuQd8Ca3D470b3dpWGU4ljzmNVPXkrl2Bi47g+08TfmEOw2bhnOWFbnzbz3S1vgHO9U7DmyuXppTAgLl4HI+IkStoj6I8ltz5u27F46IQgfdnvh+vUvtTW3lRAB9jaAHBk5+/9FubBSWhqVJGGuf56VL03DP8Iu4phB9Ow54BmdXfUb8ViAa9DO0BLhJd1Y1OkgcGlR4xYi1ZG+Eug2saSF22iW5sbUtGG085UxYP+qSCEl97smoTNzRt/aGXQbMDi6Cd+pJl9sIjaEg/6s9oSPeXmOUujcr6oPD/AJzbhtYooBffkBDyed8dc+FbYZ7an/8nnaWcSGv1zkjVdl6LQsE2HQ7kRWaGevALCsP2by8ZqRUMoHXebL4+Ux/hwkbhQLMGctjc8cCVhMlRNREbwHqyd8OgglFCrxAtBu/rw6tUQyoyg4O367syCWkKRUzKBMdYc45u9sl2R7VoBwC4ebaAbEHJdDD74PCBfrGcjLBDG0ah6UIuf/0GG1Mlhw2KpJoFf0KadoFs54E705Wrv3GyFeCyWM8="
       dry-run: true
+      on:
+        all_branches: true
     # Bintray rpm repository.
 #    - provider: bintray
 #      file: "packaging/vdist_rpm_bintray_descriptor.json"
