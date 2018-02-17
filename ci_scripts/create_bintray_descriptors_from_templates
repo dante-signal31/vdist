@@ -13,10 +13,12 @@ else:
 
 def read_templates():
     templates = {}
+    print("Reading bintray descriptor templates...")
     for template_filename in os.listdir(BINTRAY_TEMPLATES_PATH):
         template_filepath = os.path.join(BINTRAY_TEMPLATES_PATH, template_filename)
         with open(template_filepath) as json_data:
             templates[template_filename] = json.load(json_data)
+            print("Template {name} read.".format(name=template_filename))
     return templates
 
 
@@ -34,6 +36,7 @@ def create_descriptor(name, content, version):
                                                             version=version)
     with open(descriptor_folder_path, "w") as descriptor:
         json.dump(content, descriptor)
+        print("Created descriptor: {name}".format(name=descriptor_folder_path))
 
 
 if __name__ == '__main__':
