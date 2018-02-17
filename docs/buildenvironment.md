@@ -13,7 +13,8 @@ can be used effectively in conjunction with vdist:
 - an internal OS package mirror (e.g. an APT or Yum mirror)
 
 vdist would then be used in the final stage of a CI build, where it would fire
-up a preprovisioned Docker image (that resides on your private Docker registry),
+up a preprovisioned Docker image (that resides on your private Docker registry
+or in [Docker Hub](https://hub.docker.com)),
 build your project, installs your internal modules from your private PyPI
 repository, and leaves the resulting OS packages as deliveries for your CI
 system.

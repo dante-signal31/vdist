@@ -1,8 +1,13 @@
 from setuptools import setup, find_packages
+import ci_scripts.ci_tools as tools
+
+VDIST_PACKAGES_CONFIG = "packaging/vdist_build.cnf"
 
 setup(
     name='vdist',
-    version='1.1',
+    # Version is set in packaging/vdist_build.cnf and returned through
+    # tools.get_current_version().
+    version=tools.get_current_version(VDIST_PACKAGES_CONFIG),
     description='Create OS packages from Python '
                 'projects using Docker containers',
     long_description='Create OS packages from Python '
@@ -11,7 +16,8 @@ setup(
     author_email='objectified@gmail.com, dante.signal31@gmail.com',
     license='MIT',
     url='https://github.com/dante-signal31/vdist',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests", "integration-tests",
+                                    "ci_scripts", "examples", "docs"]),
     install_requires=['jinja2==2.7.3'],
     entry_points={'console_scripts': ['vdist=vdist.vdist_launcher:main', ], },
     package_data={'': ['internal_profiles.json', '*.sh']},

@@ -10,6 +10,7 @@ def _check_is_file(_string):
                                          "not exists.".format(_string))
 
 
+# TODO: Some defaults are redundant with defaults at object creation. Fix it.
 def parse_arguments(args=None):
     arg_parser = argparse.ArgumentParser(description="A tool that lets you "
                                                      "create OS packages from "
@@ -35,6 +36,14 @@ def parse_arguments(args=None):
                                      default=None,
                                      type=_check_is_file,
                                      metavar="CONFIGURATION FILENAME")
+    # [TODO] Console does not get output_script right when entered from console
+    # in batch mode.
+    automatic_subparser.add_argument("--output_script",
+                                     required=False,
+                                     help="Copy build script in output folder.",
+                                     action="store_const",
+                                     const=True,
+                                     default=False)
     manual_subparser = subparsers.add_parser("manual",
                                              help="Manual configuration. "
                                                   "Parameters are going to be "
@@ -137,6 +146,13 @@ def parse_arguments(args=None):
                                   help="Folder where generated packages should "
                                        "be placed.",
                                   metavar="OUTPUT_FOLDER")
+    manual_subparser.add_argument("--output_script",
+                                  required=False,
+                                  help="Copy build script in output folder.",
+                                  action="store_const",
+                                  const=True,
+                                  default=False)
+
     # WARNING: Keep package scripts arguments names similar to fpm arguments for
     # scripts. Arguments names from here are directly used as fpm arguments
     # names.

@@ -4,4 +4,5 @@ echo "Creating sdist package..."
 python setup.py sdist
 echo " "
 echo "Creating wheel package..."
+pip install wheel
 python setup.py bdist_wheel

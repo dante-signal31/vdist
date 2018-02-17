@@ -2,20 +2,12 @@
 PYTHON_VERSION="{{python_version}}"
 PYTHON_BASEDIR="{{python_basedir}}"
 
-# Fail on error.
+## Fail on error.
 set -e
 
-# Install general prerequisites.
-apt-get update
-apt-get install ruby-dev build-essential git python-virtualenv curl libssl-dev libsqlite3-dev libgdbm-dev libreadline-dev libbz2-dev libncurses5-dev tk-dev python3 python3-pip -y
-
-# Only install when needed, to save time with
-# pre-provisioned containers.
-if [ ! -f /usr/bin/fpm ]; then
-    gem install fpm
-fi
-
 {% if build_deps %}
+# Refresh repositories list to avoid problems with too old databases.
+apt-get update
 # Install build dependencies.
 apt-get install -y {{build_deps|join(' ')}}
 {% endif %}
@@ -23,9 +15,6 @@ apt-get install -y {{build_deps|join(' ')}}
 {% if compile_python %}
 # Download and compile what is going to be the Python we are going to use
 # as our portable python environment.
-    apt-get build-dep python -y
-    apt-get install libssl-dev -y
-
     cd /var/tmp
     curl -O https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz
     tar xzvf Python-$PYTHON_VERSION.tgz
@@ -51,7 +40,7 @@ cd {{package_tmp_root}}
 {% elif source.type in ['directory', 'git_directory'] %}
     # Place application files inside temporary folder after copying it from
     # local folder.
-    cp -r {{scratch_dir}}/{{project_root}} .
+    cp -r {{shared_dir}}/{{scratch_folder_name}}/{{project_root}} .
     cd {{package_tmp_root}}/{{project_root}}
 
     {% if source.type == 'git_directory' %}
@@ -62,7 +51,6 @@ cd {{package_tmp_root}}
 
     echo "invalid source type, exiting."
     exit 1
-
 
 {% endif %}
 
@@ -75,7 +63,7 @@ cd {{package_tmp_root}}
     mv {{working_dir}} {{package_tmp_root}} && rm -rf {{package_tmp_root}}/{{project_root}}
     cd {{package_tmp_root}}/{{working_dir}}
 
-    # Reset project_root
+    # Reset project_root.
     {% set project_root = working_dir %}
 {% endif %}
 
@@ -85,7 +73,7 @@ cd {{package_tmp_root}}
 ## code repository. Whereas you may have a folder called "lib" or "bin" that
 ## you may want to package but it doesn't come from a virtualenv. Maybe we
 ## should remove next line in a further revision.
-rm -rf bin include lib local
+# rm -rf bin include lib local
 
 # To install our application and dependencies inside our portable python
 # environment we have to run setup.py and download from Pypi using our
@@ -93,6 +81,7 @@ rm -rf bin include lib local
 if [[ ${PYTHON_VERSION:0:1} == "2" ]]; then
     PYTHON_BIN="$PYTHON_BASEDIR/bin/python"
     PIP_BIN="$PYTHON_BASEDIR/bin/pip"
+    $PYTHON_BIN -m ensurepip
 else
     PYTHON_BIN="$PYTHON_BASEDIR/bin/python3"
     PIP_BIN="$PYTHON_BASEDIR/bin/pip3"
@@ -115,7 +104,7 @@ fi
 
 cd /
 
-# Get rid of VCS info
+# Get rid of VCS info.
 find {{package_tmp_root}} -type d -name '.git' -print0 | xargs -0 rm -rf
 find {{package_tmp_root}} -type d -name '.svn' -print0 | xargs -0 rm -rf
 

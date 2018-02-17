@@ -5,24 +5,12 @@ PYTHON_BASEDIR="{{python_basedir}}"
 # Fail on error.
 set -e
 
-# Install general prerequisites.
-yum -y update
-yum install -y ruby-devel curl libyaml-devel which tar rpm-build rubygems git python-setuptools zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel epel-release
-yum -y install python34
-curl -O https://bootstrap.pypa.io/get-pip.py
-/usr/bin/python3 get-pip.py
-yum groupinstall -y "Development Tools"
-
-# Install build dependencies.
 {% if build_deps %}
+# Refresh repositories list to avoid problems with too old databases.
+yum update
+# Install build dependencies.
 yum install -y {{build_deps|join(' ')}}
 {% endif %}
-
-# Only install when needed, to save time with
-# pre-provisioned containers.
-if [ ! -f /usr/bin/fpm ]; then
-    gem install fpm
-fi
 
 # Install prerequisites
 ## TODO: Try to comment this. I think we don't need it any longer.
@@ -56,7 +44,7 @@ cd {{package_tmp_root}}
 {% elif source.type in ['directory', 'git_directory'] %}
     # Place application files inside temporary folder after copying it from
     # local folder.
-    cp -r {{scratch_dir}}/{{project_root}} .
+    cp -r {{shared_dir}}/{{scratch_folder_name}}/{{project_root}} .
     cd {{package_tmp_root}}/{{project_root}}
 
     {% if source.type == 'git_directory' %}
@@ -74,8 +62,8 @@ cd {{package_tmp_root}}
     cp -r {{scratch_dir}}/.pip ~
 {% endif %}
 
-# When working_dir is set, assume that is the base and remove the rest.
 {% if working_dir %}
+    # When working_dir is set, assume that is the base and remove the rest
     mv {{working_dir}} {{package_tmp_root}} && rm -rf {{package_tmp_root}}/{{project_root}}
     cd {{package_tmp_root}}/{{working_dir}}
 

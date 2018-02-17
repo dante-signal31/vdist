@@ -8,16 +8,17 @@ if sys.version_info[0] == 3:
 else:
     import ConfigParser as configparser
 
+import vdist.defaults as defaults
 import vdist.source as source
 
 LISTABLE_ARGUMENTS = {"source_git", "source_git_directory", "runtime_deps",
                       "build_deps"}
 LONG_TEXT_ARGUMENTS = {"fpm_args", "pip_args"}
-PROCESSABLE_ARGUMENTS = {"output_folder", "source_directory", "compile_python",
+PROCESSABLE_ARGUMENTS = {"source_directory", "compile_python",
                          "fpm_args"}
 SCRIPTS_ARGUMENTS = {"after_install", "before_install", "after_remove",
                      "before_remove", "after_upgrade", "before_upgrade"}
-USELESS_ARGUMENTS = {"mode"}
+USELESS_ARGUMENTS = {"mode", "output_folder", "output_script"}
 PROCESSABLE_ARGUMENTS |= LISTABLE_ARGUMENTS
 PROCESSABLE_ARGUMENTS |= LONG_TEXT_ARGUMENTS
 
@@ -25,7 +26,10 @@ PROCESSABLE_ARGUMENTS |= LONG_TEXT_ARGUMENTS
 class Configuration(object):
 
     def __init__(self, arguments):
-        self.output_folder = arguments.get("output_folder", None)
+        self.output_folder = arguments.get("output_folder",
+                                           defaults.OUTPUT_FOLDER)
+        self.output_script = arguments.get("output_script",
+                                           defaults.OUTPUT_SCRIPT)
         self.builder_parameters = {key: value for key, value in arguments.items()
                                    if key not in PROCESSABLE_ARGUMENTS and
                                    key not in USELESS_ARGUMENTS}

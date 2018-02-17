@@ -7,7 +7,7 @@ def test_builder_nobuilds():
     b = Builder()
 
     with pytest.raises(NoBuildsFoundException):
-        b.build()
+        b.start_build()
 
 
 def test_internal_profile_loads():

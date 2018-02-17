@@ -1,18 +1,18 @@
 {
     "centos7": {
-        "docker_image": "centos:centos7",
+        "docker_image": "dantesignal31/vdist-aux:centos7",
         "script": "centos.sh"
     },
     "centos6": {
-        "docker_image": "centos:centos6",
+        "docker_image": "dantesignal31/vdist-aux:centos6",
         "script": "centos6.sh"
     },
     "ubuntu-trusty": {
-        "docker_image": "ubuntu:trusty",
+        "docker_image": "dantesignal31/vdist-aux:ubuntu-trusty",
         "script": "debian.sh"
     },
     "debian-wheezy": {
-        "docker_image": "debian:wheezy",
+        "docker_image": "dantesignal31/vdist-aux:debian:wheezy",
         "script": "debian.sh"
     }
 }

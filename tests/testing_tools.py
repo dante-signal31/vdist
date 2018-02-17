@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import sys
+import tempfile
 
 # Python 2.x specific tools.
 if sys.version_info[0] != 3:
@@ -84,3 +85,11 @@ if sys.version_info[0] != 3:
                 if _warn:
                     warnings.warn("Implicitly cleaning up {!r}".format(self),
                                   ResourceWarning)
+
+
+def get_temporary_directory_context_manager():
+    if sys.version_info[0] == 3:
+        temporary_directory = tempfile.TemporaryDirectory
+    else:
+        temporary_directory = TemporaryDirectory
+    return temporary_directory
