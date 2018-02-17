@@ -14,13 +14,14 @@ else:
 def read_templates():
     templates = {}
     for template_filename in os.listdir(BINTRAY_TEMPLATES_PATH):
-        with open(template_filename) as json_data:
+        template_filepath = os.path.join(BINTRAY_TEMPLATES_PATH, template_filename)
+        with open(template_filepath) as json_data:
             templates[template_filename] = json.load(json_data)
     return templates
 
 
 def remove_extension(filename):
-    name_without_extension = os.path.splitext(filename)
+    name_without_extension = os.path.splitext(filename)[0]
     return name_without_extension
 
 
@@ -31,7 +32,7 @@ def create_descriptor(name, content, version):
                                           descriptor_name)
     content["version"]["name"] = "{prefix}{version}".format(prefix=VERSION_PREFIX,
                                                             version=version)
-    with open(descriptor_folder_path) as descriptor:
+    with open(descriptor_folder_path, "w") as descriptor:
         json.dump(content, descriptor)
 
 
