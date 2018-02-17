@@ -100,6 +100,7 @@ jobs:
     - travis_wait 20 sudo ci_scripts/build_system_packages
     before_deploy:
     - ci_scripts/tag_release
+    - ci_scripts/create_bintray_descriptors_from_templates
     deploy:
 #    # Github Releases.
 #    - provider: releases
@@ -116,13 +117,15 @@ jobs:
       user: "dante-signal31"
       key:
         secure: "Jl2g7M48tRrVpHByvzypDee1g/sE1QkctqgvASDbGpxr4ku5llGXSltkNJv3mIBpvqdSCO4YNM3f7bS644hy5Oxng6cyonw8sdRyCnIjk+ruFAYtXfrl3N6LODsXWH8XTsDSoSNq1wSQuQd8Ca3D470b3dpWGU4ljzmNVPXkrl2Bi47g+08TfmEOw2bhnOWFbnzbz3S1vgHO9U7DmyuXppTAgLl4HI+IkStoj6I8ltz5u27F46IQgfdnvh+vUvtTW3lRAB9jaAHBk5+/9FubBSWhqVJGGuf56VL03DP8Iu4phB9Ow54BmdXfUb8ViAa9DO0BLhJd1Y1OkgcGlR4xYi1ZG+Eug2saSF22iW5sbUtGG085UxYP+qSCEl97smoTNzRt/aGXQbMDi6Cd+pJl9sIjaEg/6s9oSPeXmOUujcr6oPD/AJzbhtYooBffkBDyed8dc+FbYZ7an/8nnaWcSGv1zkjVdl6LQsE2HQ7kRWaGevALCsP2by8ZqRUMoHXebL4+Ux/hwkbhQLMGctjc8cCVhMlRNREbwHqyd8OgglFCrxAtBu/rw6tUQyoyg4O367syCWkKRUzKBMdYc45u9sl2R7VoBwC4ebaAbEHJdDD74PCBfrGcjLBDG0ah6UIuf/0GG1Mlhw2KpJoFf0KadoFs54E705Wrv3GyFeCyWM8="
-      dry-run: true
+      dry_run: true
       on:
         all_branches: true
     # Bintray rpm repository.
-#    - provider: bintray
-#      file: "packaging/vdist_rpm_bintray_descriptor.json"
-#      user: "Bintray user"
-#      key: "Bintray API key"
-#      passphrase: "Optional. In case a passphrase is configured on Bintray and GPG signing is used"
-#      dry-run: "Optional. If true, skips sending requests to Bintray. Useful for testing your configuration"
+    - provider: bintray
+      file: "packaging/vdist_rpm_bintray_descriptor.json"
+      user: "dante-signal31"
+      key:
+        secure: "Jl2g7M48tRrVpHByvzypDee1g/sE1QkctqgvASDbGpxr4ku5llGXSltkNJv3mIBpvqdSCO4YNM3f7bS644hy5Oxng6cyonw8sdRyCnIjk+ruFAYtXfrl3N6LODsXWH8XTsDSoSNq1wSQuQd8Ca3D470b3dpWGU4ljzmNVPXkrl2Bi47g+08TfmEOw2bhnOWFbnzbz3S1vgHO9U7DmyuXppTAgLl4HI+IkStoj6I8ltz5u27F46IQgfdnvh+vUvtTW3lRAB9jaAHBk5+/9FubBSWhqVJGGuf56VL03DP8Iu4phB9Ow54BmdXfUb8ViAa9DO0BLhJd1Y1OkgcGlR4xYi1ZG+Eug2saSF22iW5sbUtGG085UxYP+qSCEl97smoTNzRt/aGXQbMDi6Cd+pJl9sIjaEg/6s9oSPeXmOUujcr6oPD/AJzbhtYooBffkBDyed8dc+FbYZ7an/8nnaWcSGv1zkjVdl6LQsE2HQ7kRWaGevALCsP2by8ZqRUMoHXebL4+Ux/hwkbhQLMGctjc8cCVhMlRNREbwHqyd8OgglFCrxAtBu/rw6tUQyoyg4O367syCWkKRUzKBMdYc45u9sl2R7VoBwC4ebaAbEHJdDD74PCBfrGcjLBDG0ah6UIuf/0GG1Mlhw2KpJoFf0KadoFs54E705Wrv3GyFeCyWM8="
+      dry_run: true
+      on:
+        all_branches: true

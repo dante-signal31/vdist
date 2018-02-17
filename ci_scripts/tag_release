@@ -3,14 +3,10 @@
 import sys
 if sys.version_info.major < 3:
     import ci_tools as tools
+    from .ci_constants import *
 else:
     from ci_scripts import ci_tools as tools
-
-
-GIT_USERNAME = "dante-signal31"
-GIT_EMAIL = "dante.signal31@gmail.com"
-VDIST_CONFIGURATION = "packaging/vdist_build.cnf"
-VERSION_PREFIX = "v"
+    from ci_scripts.ci_constants import *
 
 
 def set_contact_data(username, email):

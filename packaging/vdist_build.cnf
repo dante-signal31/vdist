@@ -1,7 +1,7 @@
 [DEFAULT]
 app = vdist
 # Don't forget to change version in bintray json descriptors.
-version = 1.2.9
+version = 1.2.10
 source_git = https://github.com/dante-signal31/${app}, travis_integration
 fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     https://github.com/dante-signal31/${app} --description

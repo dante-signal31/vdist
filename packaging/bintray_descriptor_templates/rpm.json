@@ -16,7 +16,7 @@
     },
 
     "version": {
-        "name": "1.2.9",
+        "name": "VERSION_TAG",
         "desc": "vdist (Virtualenv Distribute) is a tool that lets you build OS packages from your Python applications, while aiming to build an isolated environment for your Python project by utilizing virtualenv. This means that your application will not depend on OS provided packages of Python modules, including their versions. ",
         "released": "2018-02-11",
         "vcs_tag": "1.2.8",
