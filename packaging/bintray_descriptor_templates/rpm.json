@@ -25,5 +25,5 @@
 
     "files":
       [{"includePattern": "package_dist/(.*\\.rpm)", "uploadPattern": "$1"}],
-    "publish": false
+    "publish": true
 }

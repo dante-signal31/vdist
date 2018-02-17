@@ -30,5 +30,5 @@
             "deb_component": "main",
             "deb_architecture": "amd64"}
         }],
-    "publish": false
+    "publish": true
 }
