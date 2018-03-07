@@ -174,7 +174,7 @@ builder.add_build(
     profile='ubuntu-trusty'
 )
 
-builder.build()
+builder.run_build()
 ```
 
 Here is what it does: vdist will build an OS package called 'yourapp-1.0.deb'
@@ -216,7 +216,7 @@ builder.add_build(
     profile='ubuntu-trusty'
 )
 
-builder.build()
+builder.run_build()
 ```
 
 If all goes well, running this file as a Python program will build two OS
@@ -393,7 +393,7 @@ builder.add_build(
     custom_filename='myapp-{GIT_TAG}-{CI_BUILD_NO}-{RELEASE_NAME}.deb'
 )
 
-builder.build()
+builder.run_build()
 ```
 You can read some examples with the main vdist [use cases](usecases.md) we have
 identified. Additionally if you look in the
@@ -424,7 +424,7 @@ builder.add_build(
     profile='ubuntu-trusty'
 )
 
-builder.build()
+builder.run_build()
 ```
 
 In the above example, two things are customized for this build run:
