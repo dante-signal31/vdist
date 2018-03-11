@@ -159,22 +159,21 @@ Here is a minimal example of how to use vdist to create an OS package of
 contain the following code:
 
 ```python
-from vdist.builder import Builder
+import vdist.builder as builder
+from vdist.configuration import Configuration
 from vdist.source import git
 
-builder = Builder()
+builder_parameters = {
+            "app": 'yourapp',
+            "version": '1.0',
+            "source": git(uri='https://github.com/you/yourapp',
+                          branch='master'),
+            "profile": 'ubuntu-trusty',
+        }
 
-builder.add_build(
-    app='yourapp',
-    version='1.0',
-    source=git(
-        uri='https://github.com/you/yourapp',
-        branch='master'
-    ),
-    profile='ubuntu-trusty'
-)
+configuration = Configuration(builder_parameters)
 
-builder.run_build()
+builder.build_package(configuration)
 ```
 
 Here is what it does: vdist will build an OS package called 'yourapp-1.0.deb'
@@ -183,53 +182,12 @@ using the vdist profile 'ubuntu-trusty' (more on vdist profiles later).
 While doing so, it will download and compile a Python interpreter framework and
 installs your application's dependencies
 into that framework. The whole resulting python framework will be wrapped up in a
-package, and is the end result of the build run. Here's an example creating a
-build for two OS flavors at the same time:
-
-```python
-from vdist.builder import Builder
-from vdist.source import git
-
-builder = Builder()
-
-# Add CentOS7 build
-builder.add_build(
-    name='myproject :: centos7 build',
-    app='myproject',
-    version='1.0',
-    source=git(
-        uri='http://yourgithost.internal/yourcompany/yourproject',
-        branch='master'
-    ),
-    profile='centos7'
-)
-
-# Add Ubuntu build
-builder.add_build(
-    name='myproject :: ubuntu trusty build',
-    app='myproject',
-    version='1.0',
-    source=git(
-        uri='http://yourgithost.internal/yourcompany/yourproject',
-        branch='master'
-    ),
-    profile='ubuntu-trusty'
-)
-
-builder.run_build()
-```
-
-If all goes well, running this file as a Python program will build two OS
-packages (an RPM for CentOS 7 and a .deb package for Ubuntu Trusty Tahr)
-for a project called "myproject". The two builds will be running in parallel
-threads, so you will see the build output of both threads at the same time,
-where the logging of each thread can be identified by the build name.
-Here's an explanation of the keyword arguments that can be given to
-`add_build()`:
+package, and is the end result of the build run.
 
 At ["Required arguments"](#required-arguments) and
 ["Optional arguments"](#optional-arguments) sections, below in this very
-text, you can find a list of parameters you can set in add_build().
+text, you can find a list of parameters you can set to create your Configuration 
+instance to be passed to build_package()..
 
 ### Required arguments:
 - `app` :: the name of the application to build; this should also equal the
