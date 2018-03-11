@@ -76,6 +76,19 @@ def _get_package_folder_name(_configuration):
     return package_folder
 
 
+# Standard shutil.copytree has problems copying into an already populated
+# folder, like we do with vdist. Workaround found here:
+#     https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
+def _copytree(src, dst, symlinks=False, ignore=None):
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
+
+
 class BuildProfile(object):
 
     def __init__(self, **kwargs):
@@ -325,7 +338,7 @@ class Builder(object):
 
         # copy local ~/.pip if necessary
         if build.use_local_pip_conf:
-            shutil.copytree(
+            _copytree(
                 os.path.join(os.path.expanduser('~'), '.pip'),
                 os.path.join(build.scratch_dir, '.pip')
             )
@@ -337,7 +350,7 @@ class Builder(object):
                     'path does not exist: %s' % build.source['path'])
             else:
                 subdir = os.path.basename(build.source['path'])
-                shutil.copytree(
+                _copytree(
                     build.source['path'].rstrip('/'),
                     os.path.join(build.scratch_dir, subdir)
                 )
