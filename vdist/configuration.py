@@ -25,6 +25,11 @@ PROCESSABLE_ARGUMENTS |= LONG_TEXT_ARGUMENTS
 
 class Configuration(object):
 
+    # Using a fixed set of parameters for __init__ might be cleaner here but
+    # I've found it less scalable in this specific case. After many test I
+    # feel better for scalation using a generic dir as input and process it
+    # using various arguments sets, it keeps my __init_ shorter and it is easier
+    # add and remove arguments.
     def __init__(self, arguments):
         self.output_folder = arguments.get("output_folder",
                                            defaults.OUTPUT_FOLDER)
