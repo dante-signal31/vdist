@@ -92,7 +92,7 @@ fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     used in console with pipes and redirections along with
     applications like traceroute, nslookup, etc."
     --license BSD-3 --category net
-requirements_path = /REQUIREMENTS.txt
+requirements_path = ./REQUIREMENTS.txt
 runtime_deps = libssl1.0.0, dummy1.0.0
 compile_python = True
 python_version = 3.4.4
@@ -187,7 +187,7 @@ package, and is the end result of the build run.
 At ["Required arguments"](#required-arguments) and
 ["Optional arguments"](#optional-arguments) sections, below in this very
 text, you can find a list of parameters you can set to create your Configuration 
-instance to be passed to build_package()..
+instance to be passed to build_package().
 
 ### Required arguments:
 - `app` :: the name of the application to build; this should also equal the

@@ -10,43 +10,53 @@ its templates (shell scripts) for each individual target OS.
 The source for vdist is available under the MIT license and can be found on
 [Github](https://github.com/dante-signal31/vdist)
 
-vdist is currently in alpha stage, but it should work just fine. If you find any
+vdist is currently in beta stage, but it should work just fine. If you find any
 issues, please report issues or submit pull requests via Github.
 
 Here's a quickstart to give you an idea of how to use vdist, once you're set up.
 
+Recommended way to use vdist is through it console launcher. First create a 
+configuration file like this:
+
+```ini
+[DEFAULT]
+app = yourapp
+version = 1.0
+source_git = https://github.com/you/%(app)s, master
+compile_python = True
+python_version = 3.4.4
+requirements_path = ./requirements.txt
+build_deps = package1, package2
+runtime_deps = package3, package4
+output_folder = ./generated_packages_folder
+after_install = packaging/postinst.sh
+after_remove = packaging/postuninst.sh
+
+[Ubuntu-package]
+profile = ubuntu-trusty
+
+[Centos7-package]
+profile = centos7
 ```
-from vdist.builder import Builder
-from vdist.source import git
 
-builder = Builder()
+Let guess last file is called yourapp_vdist.cnf. Give that file to vdist 
+launcher running next command:
 
-builder.add_build(
-    app='yourapp',
-    version='1.0',
-    source=git(
-        uri='https://github.com/you/yourapp',
-        branch='release-1.0'
-    ),
-    profile='ubuntu-trusty',
-    build_deps=['libpq-dev'],
-    runtime_deps=['libcurl3']
-)
-
-builder.build()
+```bash
+$ vdist batch yourapp_vdist.cnf
 ```
 
 Running the above would do this:
 
 - set up a Docker container running Ubuntu Trusty Tahr
 
-- install the OS packages listed in `build_deps` (only libpq-dev in this case)
+- install the OS packages listed in `build_deps`
 
 - download and compile a python interpreter framework
 
 - git clone the repository at https://github.com/you/yourapp
 
-- checkout the branch 'release-1.0'
+- checkout the branch 'master'
 
 - install your application's dependencies from requirements.txt if found in the
 checked out branch into compiled python framework
@@ -58,29 +68,10 @@ python framework
 called `yourapp-1.0.deb` which includes a dependency on the OS packages listed
 in `runtime_deps`
 
+- repeat sequence setting up a Docker container running Centos 7.
 
-Similarly, the same build for CentOS 6 would look like this.
-
-```
-from vdist.builder import Builder
-from vdist.source import git
-
-builder = Builder()
-
-builder.add_build(
-    app='yourapp',
-    version='1.0',
-    source=git(
-        uri='https://github.com/you/yourapp',
-        branch='release-1.0'
-    ),
-    profile='centos7',
-    build_deps=['postgresql-devel'],
-    runtime_deps=['libcurl3']
-)
-
-builder.build()
-```
+- in the end you'll find generated packages for ubuntu and centos 7 in 
+generated_packages_folder.
 
 Read more about what vdist can do
 [here](http://vdistdocs.readthedocs.io/en/latest/howtouse/)
