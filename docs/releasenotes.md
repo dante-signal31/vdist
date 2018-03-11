@@ -1,5 +1,5 @@
 ## Release notes
-### 1.2.11 (2018/03/10)
+### 1.2.12 (2018/03/10)
 - Fixed bug that happened when building a package from a local folder tree. 
 That bug made building fail when process tried to copy app folder tree to 
 temp folder.
