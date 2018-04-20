@@ -8,6 +8,7 @@
 
 from __future__ import absolute_import
 
+import concurrent.futures
 import sys
 
 import vdist.console_parser as console_parser
@@ -35,8 +36,10 @@ def _load_default_configuration(arguments):
 def main(args=sys.argv[1:]):
     console_arguments = console_parser.parse_arguments(args)
     configurations = _get_build_configurations(console_arguments)
-    for _configuration in configurations:
-        builder.build_package(configurations[_configuration])
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        for _configuration in configurations:
+            executor.submit(builder.build_package,
+                            configurations[_configuration])
 
 
 if __name__ == "__main__":
