@@ -38,8 +38,10 @@ def main(args=sys.argv[1:]):
     configurations = _get_build_configurations(console_arguments)
     with concurrent.futures.ProcessPoolExecutor() as executor:
         for _configuration in configurations:
+            print("Starting building process for {0}".format(_configuration))
             executor.submit(builder.build_package,
                             configurations[_configuration])
+            print("Started building process for {0}".format(_configuration))
 
 
 if __name__ == "__main__":
