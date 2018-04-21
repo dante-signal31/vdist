@@ -8,10 +8,15 @@
 
 from __future__ import absolute_import
 
+import concurrent.futures as futures
+import contextlib
+import multiprocessing
 import sys
+import time
 
 import vdist.console_parser as console_parser
 import vdist.configuration as configuration
+import vdist.defaults as defaults
 import vdist.builder as builder
 
 
@@ -27,16 +32,45 @@ def _get_build_configurations(arguments):
 
 
 def _load_default_configuration(arguments):
+    arguments.name = defaults.BUILD_NAME
     _configuration = configuration.Configuration(arguments)
-    configurations = {"Default project": _configuration, }
+    configurations = {defaults.BUILD_NAME: _configuration, }
     return configurations
 
 
+def run_builds(configurations):
+    with futures.ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+        workers = []
+        for _configuration in configurations:
+            print("Starting building process for {0}".format(_configuration))
+            worker = executor.submit(builder.build_package, configurations[_configuration])
+            workers.append(worker)
+            print("Started building process for {0}".format(_configuration))
+        print_results(workers)
+
+
+def print_results(workers):
+    for future in futures.as_completed(workers):
+        files_created = future.result()
+        for worker_name, files in files_created.items():
+            print("Files created by {0}:".format(worker_name))
+            for file in files:
+                print(file)
+
+
+@contextlib.contextmanager
+def time_execution():
+    start_time = time.time()
+    yield
+    execution_time = time.time() - start_time
+    print("Total execution time: {0} seconds".format(execution_time))
+
+
 def main(args=sys.argv[1:]):
-    console_arguments = console_parser.parse_arguments(args)
-    configurations = _get_build_configurations(console_arguments)
-    for _configuration in configurations:
-        builder.build_package(configurations[_configuration])
+    with time_execution():
+        console_arguments = console_parser.parse_arguments(args)
+        configurations = _get_build_configurations(console_arguments)
+        run_builds(configurations)
 
 
 if __name__ == "__main__":

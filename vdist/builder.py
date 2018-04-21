@@ -5,8 +5,9 @@ import os
 import shutil
 import re
 import json
-
 import sys
+import tempfile
+
 from jinja2 import Environment, FileSystemLoader
 
 import vdist.configuration as configuration
@@ -14,15 +15,16 @@ import vdist.defaults as defaults
 import vdist.buildmachine as buildmachine
 
 
-def build_package(_configuration):
+def build_package(_configuration: configuration.Configuration) -> dict:
     builder = _prepare_build(_configuration)
     if _configuration.output_script:
         builder.copy_script_to_output_folder(_configuration)
     builder.start_build()
-    builder.move_package_to_output_folder(_configuration)
+    files_created = builder.move_package_to_output_folder(_configuration)
+    return {_configuration.name: files_created, }
 
 
-def _prepare_build(_configuration):
+def _prepare_build(_configuration: configuration.Configuration) -> 'Builder':
     builder = _generate_builder(_configuration)
     builder.get_available_profiles()
     builder.create_build_folder_tree()
@@ -31,39 +33,43 @@ def _prepare_build(_configuration):
     return builder
 
 
-def _generate_builder(_configuration):
-    builder = Builder()
+def _generate_builder(_configuration: configuration.Configuration) -> 'Builder':
+    builder = Builder(process_name=_configuration.name)
     builder.add_build(**_configuration.builder_parameters)
     return builder
 
 
 # TODO: Possibly redundant with already existing code. REFACTOR
-def _get_script_output_filename(_configuration):
+def _get_script_output_filename(_configuration: configuration.Configuration) -> str:
     script_filename = "{0}.sh".format(_get_package_folder_name(_configuration))
     output_filepath = os.path.join(_configuration.output_folder,
                                    script_filename)
     return output_filepath
 
 
-def _move_generated_package(_configuration, package_folder):
+def _move_generated_package(_configuration: configuration.Configuration, package_folder: str) -> list:
+    files_moved = []
     for file in os.listdir(package_folder):
         # Only copy files with extension as they are likely the generated
         # package.
         if os.path.splitext(file)[1] != "":
-            file_pathname = os.path.join(package_folder, file)
-            shutil.copy(file_pathname, _configuration.output_folder)
+            source_file_pathname = os.path.join(package_folder, file)
+            shutil.copy(source_file_pathname, _configuration.output_folder)
+            destination_file_pathname = os.path.join(_configuration.output_folder, file)
+            files_moved.append(destination_file_pathname)
+    return files_moved
 
 
-def _get_generated_package_folder(_configuration, source_folder):
+def _get_generated_package_folder(_configuration: configuration.Configuration, source_folder: str) -> str:
     return os.path.join(source_folder, _get_package_folder_name(_configuration))
 
 
-def _create_output_folder(_configuration):
+def _create_output_folder(_configuration: configuration.Configuration) -> None:
     if not os.path.exists(_configuration.output_folder):
         _create_folder(_configuration)
 
 
-def _create_folder(_configuration):
+def _create_folder(_configuration: configuration.Configuration) -> None:
     if sys.version_info[0] == 3:
         os.makedirs(_configuration.output_folder, exist_ok=True)
     else:
@@ -71,7 +77,7 @@ def _create_folder(_configuration):
 
 
 # TODO: Possibly redundant with already existing code. REFACTOR
-def _get_package_folder_name(_configuration):
+def _get_package_folder_name(_configuration: configuration.Configuration) -> str:
     package_folder = "{app}-{version}-{profile}".format(**_configuration.builder_parameters)
     return package_folder
 
@@ -79,7 +85,7 @@ def _get_package_folder_name(_configuration):
 # Standard shutil.copytree has problems copying into an already populated
 # folder, like we do with vdist. Workaround found here:
 #     https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
-def _copytree(src, dst, symlinks=False, ignore=None):
+def _copytree(src: str, dst: str, symlinks: bool=False, ignore: bool=None) -> None:
     for item in os.listdir(src):
         s = os.path.join(src, item)
         d = os.path.join(dst, item)
@@ -234,14 +240,15 @@ class Builder(object):
 
     def __init__(
             self,
+            process_name=defaults.BUILD_NAME,
             profiles_dir=defaults.LOCAL_PROFILES_DIR,
             machine_logs=True):
         logging.basicConfig(format='%(asctime)s %(levelname)s '
-                            '[%(threadName)s] %(name)s %(message)s',
+                            '[{0}] %(name)s %(message)s'.format(process_name),
                             level=logging.INFO)
         self.logger = logging.getLogger('Builder')
 
-        self.build_basedir = defaults.BUILD_BASEDIR
+        self.build_basedir = tempfile.mkdtemp(prefix="vdist")
         self.profiles = {}
         # Actually, list of pending builds is no longer stored here, but in
         # vdist_launcher configurations when console launcher is used.
@@ -424,8 +431,9 @@ class Builder(object):
         script_output_filepath = _get_script_output_filename(_configuration)
         shutil.copy(script_filepath, script_output_filepath)
 
-    def move_package_to_output_folder(self, _configuration):
-        _move_generated_package(_configuration, self.build.build_tmp_dir)
+    def move_package_to_output_folder(self, _configuration: configuration.Configuration) -> list:
+        files_moved = _move_generated_package(_configuration, self.build.build_tmp_dir)
+        return files_moved
 
 
 class BuildProfileNotFoundException(Exception):

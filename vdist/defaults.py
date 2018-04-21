@@ -14,5 +14,6 @@ PACKAGE_INSTALL_ROOT = PYTHON_BASEDIR
 PACKAGE_TMP_ROOT = '/tmp'
 OUTPUT_FOLDER = "./"
 OUTPUT_SCRIPT = False
+BUILD_NAME = "Default project"
 
 PYTHON3_INTERPRETER = True if sys.version_info[0] == 3 else False
