@@ -36,9 +36,7 @@ def _load_default_configuration(arguments):
     return configurations
 
 
-def main(args=sys.argv[1:]):
-    console_arguments = console_parser.parse_arguments(args)
-    configurations = _get_build_configurations(console_arguments)
+def run_builds(configurations):
     with futures.ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
         workers = []
         for _configuration in configurations:
@@ -46,12 +44,22 @@ def main(args=sys.argv[1:]):
             worker = executor.submit(builder.build_package, configurations[_configuration])
             workers.append(worker)
             print("Started building process for {0}".format(_configuration))
-        for future in futures.as_completed(workers):
-            files_created = future.result()
-            for worker_name, files in files_created.items():
-                print("Files created by {0}:".format(worker_name))
-                for file in files:
-                    print(file)
+        print_results(workers)
+
+
+def print_results(workers):
+    for future in futures.as_completed(workers):
+        files_created = future.result()
+        for worker_name, files in files_created.items():
+            print("Files created by {0}:".format(worker_name))
+            for file in files:
+                print(file)
+
+
+def main(args=sys.argv[1:]):
+    console_arguments = console_parser.parse_arguments(args)
+    configurations = _get_build_configurations(console_arguments)
+    run_builds(configurations)
 
 
 if __name__ == "__main__":
