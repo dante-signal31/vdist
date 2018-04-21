@@ -8,7 +8,8 @@
 
 from __future__ import absolute_import
 
-import concurrent.futures
+import concurrent.futures as futures
+import multiprocessing
 import sys
 
 import vdist.console_parser as console_parser
@@ -38,12 +39,19 @@ def _load_default_configuration(arguments):
 def main(args=sys.argv[1:]):
     console_arguments = console_parser.parse_arguments(args)
     configurations = _get_build_configurations(console_arguments)
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with futures.ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+        workers = []
         for _configuration in configurations:
             print("Starting building process for {0}".format(_configuration))
-            executor.submit(builder.build_package,
-                            configurations[_configuration])
+            worker = executor.submit(builder.build_package, configurations[_configuration])
+            workers.append(worker)
             print("Started building process for {0}".format(_configuration))
+        for future in futures.as_completed(workers):
+            files_created = future.result()
+            for worker_name, files in files_created.items():
+                print("Files created by {0}:".format(worker_name))
+                for file in files:
+                    print(file)
 
 
 if __name__ == "__main__":

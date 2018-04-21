@@ -105,7 +105,7 @@ def read(configuration_file):
     configurations = {}
     for section in parser.sections():
         parameters = _get_section_values(parser, section)
-        parameters.name = section
+        parameters["name"] = section
         configurations[section] = Configuration(parameters)
     return configurations
 
