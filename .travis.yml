@@ -78,19 +78,19 @@ jobs:
     if: branch = staging
     script:
     - ci_scripts/merge_with_production
-#  # Upload packages to Python Package Index.
-#  - stage: Pypi deployment
-#    python: 3.6
-#    script: echo "Deploying to Python Package Index..."
-#    deploy:
-#    - provider: pypi
-#      user:
-#        secure: "DUgDI1bayvA2uPQRck4jT9GEiRLgGjh+zSZVqZrdO7rR8LG3JDdsuGxYUOyvoH498q4uUY6a4VoN+VcxOHyDbXkMSEz91P29rj5lKAnyk3X0+iI81HyF42BMvOB4BzNpn5ym9LWmPpijDX09NRC50EvqMZTWxOabvOmmbLRoc21h2pPce+4Qs6YK6p3QSKVKRXISRMmH6VoSSSO1dMFDvF8NKt+H4v8SFsBdQae5VFd4/srHlBH2cF1Atow/Y3SPtqG3Y4Ln40noTowgO0Sh2Gry/6ioGeURaYGLWdKPyvHuLQTqR8GOkzvlkbY0gSjTkCVDzoqfLepDwJW0x8sw37LE/4HB18YxhT/d3IHPgESU2wttVeNA3/RHGOy/aXJDQrs81lPIZyJHNmBaJJpkvV6jRct80c0xSaWiH5X/DomLpxKpf5e+Itca5sCV5rwnf31AW05B2sdoEq6UxQMeoNJ5o5+3yM8H9HWwfZ88sSgcgqENnye6QxDPIMXGgXyMZ7qiuFhucsxbQ8SqMetAtc/yq08szuFVqGuSkRBGbPpP/QgebY885TdKsGCCUUNf1YmzNksYRaDvmPGizpxYPPgkSqehIAocVYC8WPwHYe4yio25UVFbt/QixSiBEOx1+G8Qb/OY/Hqpn4rZsqmuYUgzfxtUm5LzGXG565dI7dE="
-#      password:
-#        secure: "X7LVEIqj77L8N8ZRY4rPyQunL44GqnzwCdvXF8n03OUIC+U4WVC5QXMdcZ8PnJBJHxI1jQuascZGBT4+xO97sMWlCFZxHGLDkWTJkp3fqxIaO5BjpGEl3Ofl1qAHMhchknRdko18bFiE6sm/PLbg66rspBlepSGsGLf/3j9DIMIx9voWD5VnspBFLnhMEUmtyjrk+ORIR0O7mXPrgEkyZGdGRly4Tuo8jTg0v7LbskkkNDJDYtwfiGLkDSK0+5TuMiLuzo4Zf3pe2+clTvqzN+xx/2mW5w46/bYNNTqoFRPwN3X2MGCddnR07Njo4XHTaI+6gXh1/Dwax5Q/zsf8IrSNS9yBbco5eQx/0FlZuVzIFxPsWJbd90V0a5914zP3U3rJoWMULCje/dBW06atDEvCojMOXBiLmtAd3kbXdifrzcO+CPjBI8SaBaSRC48szRUeIoRkSKLzGz/c/wehU7BfV/8UQZ4ds+XCYfnKCzA66pzwOnSOXeRnV3EJAcugZhpY6trohKzFZxEECBhYu3DZXV49vZChWtKWUoc+WznDAR36wFlvOLMA4eZV4CVgSnNnqd26iaSLOYGNDbT956Z98mzV4MmAAuqAlaEWoj12c5qWOBd9N2wayCKd1YsPbZ+sdBwPht5MKJy8Nf61zF3LgABXndY0pITSdxEkRk0="
-#      distributions: "sdist bdist_wheel"
-#      on:
-#        branch: staging
+  # Upload packages to Python Package Index.
+  - stage: Pypi deployment
+    python: 3.6
+    script: echo "Deploying to Python Package Index..."
+    deploy:
+    - provider: pypi
+      user:
+        secure: "DUgDI1bayvA2uPQRck4jT9GEiRLgGjh+zSZVqZrdO7rR8LG3JDdsuGxYUOyvoH498q4uUY6a4VoN+VcxOHyDbXkMSEz91P29rj5lKAnyk3X0+iI81HyF42BMvOB4BzNpn5ym9LWmPpijDX09NRC50EvqMZTWxOabvOmmbLRoc21h2pPce+4Qs6YK6p3QSKVKRXISRMmH6VoSSSO1dMFDvF8NKt+H4v8SFsBdQae5VFd4/srHlBH2cF1Atow/Y3SPtqG3Y4Ln40noTowgO0Sh2Gry/6ioGeURaYGLWdKPyvHuLQTqR8GOkzvlkbY0gSjTkCVDzoqfLepDwJW0x8sw37LE/4HB18YxhT/d3IHPgESU2wttVeNA3/RHGOy/aXJDQrs81lPIZyJHNmBaJJpkvV6jRct80c0xSaWiH5X/DomLpxKpf5e+Itca5sCV5rwnf31AW05B2sdoEq6UxQMeoNJ5o5+3yM8H9HWwfZ88sSgcgqENnye6QxDPIMXGgXyMZ7qiuFhucsxbQ8SqMetAtc/yq08szuFVqGuSkRBGbPpP/QgebY885TdKsGCCUUNf1YmzNksYRaDvmPGizpxYPPgkSqehIAocVYC8WPwHYe4yio25UVFbt/QixSiBEOx1+G8Qb/OY/Hqpn4rZsqmuYUgzfxtUm5LzGXG565dI7dE="
+      password:
+        secure: "X7LVEIqj77L8N8ZRY4rPyQunL44GqnzwCdvXF8n03OUIC+U4WVC5QXMdcZ8PnJBJHxI1jQuascZGBT4+xO97sMWlCFZxHGLDkWTJkp3fqxIaO5BjpGEl3Ofl1qAHMhchknRdko18bFiE6sm/PLbg66rspBlepSGsGLf/3j9DIMIx9voWD5VnspBFLnhMEUmtyjrk+ORIR0O7mXPrgEkyZGdGRly4Tuo8jTg0v7LbskkkNDJDYtwfiGLkDSK0+5TuMiLuzo4Zf3pe2+clTvqzN+xx/2mW5w46/bYNNTqoFRPwN3X2MGCddnR07Njo4XHTaI+6gXh1/Dwax5Q/zsf8IrSNS9yBbco5eQx/0FlZuVzIFxPsWJbd90V0a5914zP3U3rJoWMULCje/dBW06atDEvCojMOXBiLmtAd3kbXdifrzcO+CPjBI8SaBaSRC48szRUeIoRkSKLzGz/c/wehU7BfV/8UQZ4ds+XCYfnKCzA66pzwOnSOXeRnV3EJAcugZhpY6trohKzFZxEECBhYu3DZXV49vZChWtKWUoc+WznDAR36wFlvOLMA4eZV4CVgSnNnqd26iaSLOYGNDbT956Z98mzV4MmAAuqAlaEWoj12c5qWOBd9N2wayCKd1YsPbZ+sdBwPht5MKJy8Nf61zF3LgABXndY0pITSdxEkRk0="
+      distributions: "sdist bdist_wheel"
+      on:
+        branch: staging
   # Build DEB and RPM packages and upload them to Github and Bintray.
   - stage: System packages deployment
     python: 3.6
@@ -101,14 +101,14 @@ jobs:
     - ci_scripts/create_bintray_descriptors_from_templates
     deploy:
     # Github Releases.
-#    - provider: releases
-#      api_key:
-#        secure: "B+nKpJMdEL2F6Ly6zH/6D3iuHNVodJpFa6nDsUMGOJAOVlJFjuZA6+natEMm7QZudZYFxyhidil86UsKtyM0qEP9LzzF3861npLCeD6FQrmLJabj5TxfLldE1W7ZEXLr2tSWkysN3y3pGKSWZMQa74vfvo7PI6y02afJ9B3OQfDJx9jpwvFiXHwTLtkXzKR/P+WvjAvb/HrETjnaYhy5a7GSAXQPI6dtheGUiPUIaozJJS6sSX+h5Ro4FCwNilQM86vs1vLJpcjtMPssVwBM41fHhxqJxLI1QAivqHXCuR0TLdx6AyRYRG5Fcgyyok2WTXgzTRwA/n27PnkaPQOhKiyChR0kZs2jpQ/U+gf2QEElbQlRRLkEWNSV3s8TpOVSs+vWmDb/AI/HUYtbiJTZCclo+jh+S4bOkqWbbdhOauI5xdrYlopRWRwT7FbYqNONor0jSMsLnhGUMOXEsq0v6f2FoCKQBFgSjddoztLBkqa8PqOcnn7b0yVk09UwLDNJENjD4BLK2wI5W9Z2RC0pxsf6RJ4QMBfJ8ONEm8GSytEQZDOZHkqkh79dzadNufwJ41k5XHEXLtTMRGFgOAE/fl+A6OZJUxN6l/mBh9mkdIqDoFvZZRMh5ogodh04btv45mUWQUOuOgnCOzwP46Mn/poQ19akSYh6pibsYhgAk4k="
-#      file_glob: true
-#      file: package_dist/*
-#      skip_cleanup: true
-#      on:
-#        all_branches: true
+    - provider: releases
+      api_key:
+        secure: "B+nKpJMdEL2F6Ly6zH/6D3iuHNVodJpFa6nDsUMGOJAOVlJFjuZA6+natEMm7QZudZYFxyhidil86UsKtyM0qEP9LzzF3861npLCeD6FQrmLJabj5TxfLldE1W7ZEXLr2tSWkysN3y3pGKSWZMQa74vfvo7PI6y02afJ9B3OQfDJx9jpwvFiXHwTLtkXzKR/P+WvjAvb/HrETjnaYhy5a7GSAXQPI6dtheGUiPUIaozJJS6sSX+h5Ro4FCwNilQM86vs1vLJpcjtMPssVwBM41fHhxqJxLI1QAivqHXCuR0TLdx6AyRYRG5Fcgyyok2WTXgzTRwA/n27PnkaPQOhKiyChR0kZs2jpQ/U+gf2QEElbQlRRLkEWNSV3s8TpOVSs+vWmDb/AI/HUYtbiJTZCclo+jh+S4bOkqWbbdhOauI5xdrYlopRWRwT7FbYqNONor0jSMsLnhGUMOXEsq0v6f2FoCKQBFgSjddoztLBkqa8PqOcnn7b0yVk09UwLDNJENjD4BLK2wI5W9Z2RC0pxsf6RJ4QMBfJ8ONEm8GSytEQZDOZHkqkh79dzadNufwJ41k5XHEXLtTMRGFgOAE/fl+A6OZJUxN6l/mBh9mkdIqDoFvZZRMh5ogodh04btv45mUWQUOuOgnCOzwP46Mn/poQ19akSYh6pibsYhgAk4k="
+      file_glob: true
+      file: package_dist/*
+      skip_cleanup: true
+      on:
+        all_branches: true
     # Bintray deb repository.
     - provider: bintray
       file: "packaging/vdist_deb_bintray_descriptor.json"
