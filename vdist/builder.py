@@ -31,8 +31,8 @@ def _prepare_build(_configuration):
     return builder
 
 
-def _generate_builder(_configuration):
-    builder = Builder()
+def _generate_builder(_configuration: configuration.Configuration):
+    builder = Builder(process_name=_configuration.name)
     builder.add_build(**_configuration.builder_parameters)
     return builder
 
@@ -234,10 +234,11 @@ class Builder(object):
 
     def __init__(
             self,
+            process_name=defaults.BUILD_NAME,
             profiles_dir=defaults.LOCAL_PROFILES_DIR,
             machine_logs=True):
         logging.basicConfig(format='%(asctime)s %(levelname)s '
-                            '[%(threadName)s] %(name)s %(message)s',
+                            '[{0}] %(name)s %(message)s'.format(process_name),
                             level=logging.INFO)
         self.logger = logging.getLogger('Builder')
 

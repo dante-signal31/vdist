@@ -18,7 +18,7 @@ PROCESSABLE_ARGUMENTS = {"source_directory", "compile_python",
                          "fpm_args"}
 SCRIPTS_ARGUMENTS = {"after_install", "before_install", "after_remove",
                      "before_remove", "after_upgrade", "before_upgrade"}
-USELESS_ARGUMENTS = {"mode", "output_folder", "output_script"}
+USELESS_ARGUMENTS = {"mode", "name", "output_folder", "output_script"}
 PROCESSABLE_ARGUMENTS |= LISTABLE_ARGUMENTS
 PROCESSABLE_ARGUMENTS |= LONG_TEXT_ARGUMENTS
 
@@ -35,6 +35,7 @@ class Configuration(object):
                                            defaults.OUTPUT_FOLDER)
         self.output_script = arguments.get("output_script",
                                            defaults.OUTPUT_SCRIPT)
+        self.name = arguments.get("name", defaults.BUILD_NAME)
         self.builder_parameters = {key: value for key, value in arguments.items()
                                    if key not in PROCESSABLE_ARGUMENTS and
                                    key not in USELESS_ARGUMENTS}
@@ -104,6 +105,7 @@ def read(configuration_file):
     configurations = {}
     for section in parser.sections():
         parameters = _get_section_values(parser, section)
+        parameters.name = section
         configurations[section] = Configuration(parameters)
     return configurations
 

@@ -13,6 +13,7 @@ import sys
 
 import vdist.console_parser as console_parser
 import vdist.configuration as configuration
+import vdist.defaults as defaults
 import vdist.builder as builder
 
 
@@ -28,8 +29,9 @@ def _get_build_configurations(arguments):
 
 
 def _load_default_configuration(arguments):
+    arguments.name = defaults.BUILD_NAME
     _configuration = configuration.Configuration(arguments)
-    configurations = {"Default project": _configuration, }
+    configurations = {defaults.BUILD_NAME: _configuration, }
     return configurations
 
 
