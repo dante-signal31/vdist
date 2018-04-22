@@ -1,8 +1,14 @@
 ## Release notes
-### 1.2.15 (2018/04/21)
+### 1.3 (2018/04/21)
 - Added multiprocessing support. Now builds are run parallely if run in
 multicore machines. So, if you build for many targets you're going to
 experience great performance improvement.
+- This is the first release that removes Python 2 support. I want to
+include some features to make code more maintainable but those are Python 3
+only. Be aware that this only could affect you if you use vdist in
+integration mode or from Pypi. If you use it from a DEB or RPM install
+then you are safe because those packages include their own python framework
+apart the one you use in your system.
 ### 1.2.12 (2018/03/10)
 - Fixed bug that happened when building a package from a local folder tree. 
 That bug made building fail when process tried to copy app folder tree to 
