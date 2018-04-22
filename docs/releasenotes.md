@@ -1,5 +1,5 @@
 ## Release notes
-### 1.2.15 (2018/04/21)
+### 1.3 (2018/04/21)
 - Added multiprocessing support. Now builds are run parallely if run in
 multicore machines. So, if you build for many targets you're going to
 experience great performance improvement.
