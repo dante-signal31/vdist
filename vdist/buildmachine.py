@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import docker
 import itertools
 import logging
 import os
@@ -18,8 +19,10 @@ class BuildMachine(object):
         self.image = image
 
         self.container_id = None
+        self.container = None
 
         self.docker_cli = docker_cli
+        self.docker_client = docker.from_env()
 
         self.insecure_registry = insecure_registry
 
@@ -54,11 +57,13 @@ class BuildMachine(object):
 
     @staticmethod
     def _binds_to_shell_volumes(binds):
-        if defaults.PYTHON3_INTERPRETER:
-            vol_list = ['-v %s:%s' % (k, v) for k, v in binds.items()]
-        else:
-            vol_list = ['-v %s:%s' % (k, v) for k, v in binds.iteritems()]
-        return ' '.join(vol_list)
+        # if defaults.PYTHON3_INTERPRETER:
+        #     vol_list = ['-v %s:%s' % (k, v) for k, v in binds.items()]
+        # else:
+        #     vol_list = ['-v %s:%s' % (k, v) for k, v in binds.iteritems()]
+        # return ' '.join(vol_list)
+        volumes = {k: {'bind': v, 'mode': 'rw'} for k, v in binds.items()}
+        return volumes
 
     def launch(self, build_dir, extra_binds=None):
         binds = {build_dir: defaults.SHARED_DIR}
@@ -70,15 +75,18 @@ class BuildMachine(object):
             defaults.SCRATCH_BUILDSCRIPT_NAME
         )
         self.logger.info('Starting container: %s' % self.image)
-        self.container_id = self._run_cli(
-            '%s run -d -ti %s %s bash' %
-            (self.docker_cli,
-             self._binds_to_shell_volumes(binds),
-             self.image))
-
-        self._run_cli(
-            '%s exec %s %s' %
-            (self.docker_cli, self.container_id, path_to_command))
+        # self.container_id = self._run_cli(
+        #     '%s run -d -ti %s %s bash' %
+        #     (self.docker_cli,
+        #      self._binds_to_shell_volumes(binds),
+        #      self.image))
+        self.container = self.docker_client.containers.run(image=self.image, detach=True, command="bash", tty=True,
+                                                           stdin_open=True, volumes=self._binds_to_shell_volumes(binds))
+        self.container_id = self.container.id
+        # self._run_cli(
+        #     '%s exec %s %s' %
+        #     (self.docker_cli, self.container_id, path_to_command))
+        self.container.exec_run(path_to_command)
 
     def shutdown(self):
         self.logger.info('Stopping container: %s' % self.container_id)
