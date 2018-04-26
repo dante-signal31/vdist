@@ -86,7 +86,9 @@ class BuildMachine(object):
         # self._run_cli(
         #     '%s exec %s %s' %
         #     (self.docker_cli, self.container_id, path_to_command))
-        self.container.exec_run(path_to_command)
+        result = self.container.exec_run(path_to_command, stream=True)
+        for line in result.output:
+            self.logger.info(line.decode("utf8"))
 
     def shutdown(self):
         self.logger.info('Stopping container: %s' % self.container_id)
