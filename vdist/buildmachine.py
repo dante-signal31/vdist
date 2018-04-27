@@ -91,8 +91,12 @@ class BuildMachine(object):
             self.logger.info(line.decode("utf8"))
 
     def shutdown(self):
-        self.logger.info('Stopping container: %s' % self.container_id)
-        self._run_cli('%s stop %s' % (self.docker_cli, self.container_id))
+        # self.logger.info('Stopping container: %s' % self.container_id)
+        # self._run_cli('%s stop %s' % (self.docker_cli, self.container_id))
+        self.logger.info('Stopping container: %s' % self.container.id)
+        self.container.stop()
 
-        self.logger.info('Removing container: %s' % self.container_id)
-        self._run_cli('%s rm -f %s' % (self.docker_cli, self.container_id))
+        # self.logger.info('Removing container: %s' % self.container_id)
+        # self._run_cli('%s rm -f %s' % (self.docker_cli, self.container_id))
+        self.logger.info('Removing container: %s' % self.container.id)
+        self.container.remove(force=True)

@@ -2,7 +2,7 @@
 app = vdist
 # All version tags, even bintray json descriptors, are automatically updated from next value.
 version = 1.3
-source_git = https://github.com/dante-signal31/${app}, travis_integration
+source_git = https://github.com/dante-signal31/${app}, master
 fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     https://github.com/dante-signal31/${app} --description
     "vdist (Virtualenv Distribute) is a tool that lets you build OS packages
