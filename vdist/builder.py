@@ -384,7 +384,6 @@ class Builder(object):
         self.logger.info('launching docker image: %s' % profile.docker_image)
 
         build_machine = buildmachine.BuildMachine(
-            machine_logs=self.machine_logs,
             image=profile.docker_image
         )
 
