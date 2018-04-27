@@ -99,6 +99,7 @@ class BuildProfile(object):
 
     def __init__(self, **kwargs):
         self.required_attrs = ['profile_id', 'docker_image', 'script']
+        # TODO: I'm not sure about insecure_registry is actually used any longer. Try to remove it.
         self.optional_attrs = ['insecure_registry']
 
         for arg in kwargs:
