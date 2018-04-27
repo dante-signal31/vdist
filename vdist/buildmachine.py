@@ -54,7 +54,7 @@ class BuildMachine(object):
 
     # I've been unable to locate Container class in docker exported hierarchy. So I've set Any as return type.
     def _start_container(self, binds: Dict[str, str]) -> Any:
-        self.logger.info('Starting container: %s' % self.image)
+        self.logger.info(f'Starting container: {self.image}')
         container = self.docker_client.containers.run(image=self.image, detach=True, command="bash", tty=True,
                                                       stdin_open=True, volumes=self._binds_to_shell_volumes(binds))
         return container
@@ -64,9 +64,9 @@ class BuildMachine(object):
         self._remove_container()
 
     def _remove_container(self) -> None:
-        self.logger.info('Removing container: %s' % self.container.id)
+        self.logger.info(f'Removing container: {self.container.id}')
         self.container.remove(force=True)
 
     def _stop_container(self) -> None:
-        self.logger.info('Stopping container: %s' % self.container.id)
+        self.logger.info(f'Stopping container: {self.container.id}')
         self.container.stop()
