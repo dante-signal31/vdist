@@ -99,6 +99,7 @@ class BuildProfile(object):
 
     def __init__(self, **kwargs):
         self.required_attrs = ['profile_id', 'docker_image', 'script']
+        # TODO: I'm not sure about insecure_registry is actually used any longer. Try to remove it.
         self.optional_attrs = ['insecure_registry']
 
         for arg in kwargs:
@@ -384,9 +385,7 @@ class Builder(object):
         self.logger.info('launching docker image: %s' % profile.docker_image)
 
         build_machine = buildmachine.BuildMachine(
-            machine_logs=self.machine_logs,
-            image=profile.docker_image,
-            insecure_registry=profile.insecure_registry
+            image=profile.docker_image
         )
 
         self.logger.info('Running build machine for: %s' % self.build.name)

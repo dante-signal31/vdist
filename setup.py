@@ -18,7 +18,7 @@ setup(
     url='https://github.com/dante-signal31/vdist',
     packages=find_packages(exclude=["tests", "integration-tests",
                                     "ci_scripts", "examples", "docs"]),
-    install_requires=['jinja2==2.7.3'],
+    install_requires=['jinja2==2.7.3', 'docker==3.2.1'],
     entry_points={'console_scripts': ['vdist=vdist.vdist_launcher:main', ], },
     package_data={'': ['internal_profiles.json', '*.sh']},
     tests_require=['pytest'],

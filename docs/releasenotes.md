@@ -1,4 +1,9 @@
 ## Release notes
+### 1.4 (2018/04/28)
+- Inner docker engine has been refactored to use docker AOI instead of console
+commands. This way basecode is cleaner and easier to maintain.
+- Mode codebase has been refactored to a more idiomatic Python 3.
+
 ### 1.3.1 (2012/04/27)
 - Urgent fix. I've realized that packaging configuration had a wrong parameter,
 so version that was being packaged was not from master branch but from
