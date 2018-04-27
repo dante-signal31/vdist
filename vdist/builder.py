@@ -385,8 +385,7 @@ class Builder(object):
 
         build_machine = buildmachine.BuildMachine(
             machine_logs=self.machine_logs,
-            image=profile.docker_image,
-            insecure_registry=profile.insecure_registry
+            image=profile.docker_image
         )
 
         self.logger.info('Running build machine for: %s' % self.build.name)

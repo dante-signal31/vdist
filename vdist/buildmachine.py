@@ -1,67 +1,38 @@
 from __future__ import absolute_import
 
-import docker
+import functools
 import itertools
 import logging
 import os
-import subprocess
+
+import docker
 
 import vdist.defaults as defaults
 
 
+def print_output(function):
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        # This is a method decorator.
+        self = args[0]
+        result = function(*args, **kwargs)
+        for line in result.output:
+            self.logger.info(line.decode("utf8"))
+        return result
+    return wrapper
+
+
 class BuildMachine(object):
 
-    def __init__(self, machine_logs=True, image=None, insecure_registry=False,
-                 docker_cli='docker'):
+    def __init__(self, machine_logs=True, image=None):
         self.logger = logging.getLogger('BuildMachine')
-
-        self.machine_logs = machine_logs
+        # self.machine_logs = machine_logs
         self.image = image
-
-        self.container_id = None
         self.container = None
-
-        self.docker_cli = docker_cli
         self.docker_client = docker.from_env()
-
-        self.insecure_registry = insecure_registry
-
-    def _run_cli(self, cmd):
-        self.logger.info('Running command: "%s"' % cmd)
-        p = subprocess.Popen(
-            cmd,
-            shell=True,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-
-        media = [p.stdout, p.stderr]
-        first_line = self._read_from_media(media)
-
-        p.stdout.close()
-        p.stderr.close()
-        p.wait()
-
-        return first_line
-
-    def _read_from_media(self, media):
-        first_line = None
-        for input_to_read in media:
-            for line in iter(input_to_read.readline, b''):
-                line = str(line.decode("UTF-8")).strip()
-                if not first_line:
-                    first_line = line
-                self.logger.info(line)
-        return first_line
 
     @staticmethod
     def _binds_to_shell_volumes(binds):
-        # if defaults.PYTHON3_INTERPRETER:
-        #     vol_list = ['-v %s:%s' % (k, v) for k, v in binds.items()]
-        # else:
-        #     vol_list = ['-v %s:%s' % (k, v) for k, v in binds.iteritems()]
-        # return ' '.join(vol_list)
         volumes = {k: {'bind': v, 'mode': 'rw'} for k, v in binds.items()}
         return volumes
 
@@ -74,29 +45,28 @@ class BuildMachine(object):
             defaults.SCRATCH_DIR,
             defaults.SCRATCH_BUILDSCRIPT_NAME
         )
+        self.container = self._start_container(binds)
+        self._run_command_on_container(path_to_command)
+
+    @print_output
+    def _run_command_on_container(self, path_to_command):
+        output = self.container.exec_run(path_to_command, stream=True)
+        return output
+
+    def _start_container(self, binds):
         self.logger.info('Starting container: %s' % self.image)
-        # self.container_id = self._run_cli(
-        #     '%s run -d -ti %s %s bash' %
-        #     (self.docker_cli,
-        #      self._binds_to_shell_volumes(binds),
-        #      self.image))
-        self.container = self.docker_client.containers.run(image=self.image, detach=True, command="bash", tty=True,
-                                                           stdin_open=True, volumes=self._binds_to_shell_volumes(binds))
-        self.container_id = self.container.id
-        # self._run_cli(
-        #     '%s exec %s %s' %
-        #     (self.docker_cli, self.container_id, path_to_command))
-        result = self.container.exec_run(path_to_command, stream=True)
-        for line in result.output:
-            self.logger.info(line.decode("utf8"))
+        container = self.docker_client.containers.run(image=self.image, detach=True, command="bash", tty=True,
+                                                      stdin_open=True, volumes=self._binds_to_shell_volumes(binds))
+        return container
 
     def shutdown(self):
-        # self.logger.info('Stopping container: %s' % self.container_id)
-        # self._run_cli('%s stop %s' % (self.docker_cli, self.container_id))
-        self.logger.info('Stopping container: %s' % self.container.id)
-        self.container.stop()
+        self._stop_container()
+        self._remove_container()
 
-        # self.logger.info('Removing container: %s' % self.container_id)
-        # self._run_cli('%s rm -f %s' % (self.docker_cli, self.container_id))
+    def _remove_container(self):
         self.logger.info('Removing container: %s' % self.container.id)
         self.container.remove(force=True)
+
+    def _stop_container(self):
+        self.logger.info('Stopping container: %s' % self.container.id)
+        self.container.stop()
