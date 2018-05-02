@@ -2,7 +2,10 @@
 ### 1.4 (2018/04/28)
 - Inner docker engine has been refactored to use docker AOI instead of console
 commands. This way basecode is cleaner and easier to maintain.
-- Mode codebase has been refactored to a more idiomatic Python 3.
+- Since Python 2.7 is now longer a supported platform for vdist, all
+inner python 2 code has been removed. That way code should be easier
+to maintain.
+- Codebase has been refactored to a more idiomatic Python 3.
 ### 1.3 (2018/04/21)
 - Added multiprocessing support. Now builds are run parallely if run in
 multicore machines. So, if you build for many targets you're going to
