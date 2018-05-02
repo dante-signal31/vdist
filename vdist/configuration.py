@@ -7,6 +7,7 @@ if sys.version_info[0] == 3:
     import configparser
 else:
     import ConfigParser as configparser
+from typing import Dict
 
 import vdist.defaults as defaults
 import vdist.source as source
@@ -97,7 +98,7 @@ def _remove_cr(text):
         return text.translate(translation_table)
 
 
-def read(configuration_file):
+def read(configuration_file: str) -> Dict[str, Configuration]:
     # Should return a dict whose keys should be configfile sections
     # (except DEFAULT) and configurations objects as values.
     parser = _get_config_parser()

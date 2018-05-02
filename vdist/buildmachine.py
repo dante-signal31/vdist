@@ -1,25 +1,12 @@
 from __future__ import absolute_import
 
-import functools
 import itertools
 import logging
 import os
-from typing import Dict, Tuple, Generator, Any
+from typing import Dict, Any
 import docker
 
 import vdist.defaults as defaults
-
-
-def print_output(function):
-    @functools.wraps(function)
-    def wrapper(*args, **kwargs):
-        # This is a method decorator.
-        self = args[0]
-        result = function(*args, **kwargs)
-        for line in result.output:
-            self.logger.info(line.decode("utf8"))
-        return result
-    return wrapper
 
 
 class BuildMachine(object):
@@ -47,10 +34,11 @@ class BuildMachine(object):
         self.container = self._start_container(binds)
         self._run_command_on_container(path_to_command)
 
-    @print_output
-    def _run_command_on_container(self, path_to_command: str) -> Tuple[int, Generator[str]]:
-        output = self.container.exec_run(path_to_command, stream=True)
-        return output
+    def _run_command_on_container(self, path_to_command: str) -> int:
+        result = self.container.exec_run(path_to_command, stream=True)
+        for line in result.output:
+            self.logger.info(line.decode("utf8"))
+        return result.exit_code
 
     # I've been unable to locate Container class in docker exported hierarchy. So I've set Any as return type.
     def _start_container(self, binds: Dict[str, str]) -> Any:

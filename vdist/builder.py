@@ -7,6 +7,7 @@ import re
 import json
 import sys
 import tempfile
+from typing import Tuple, Dict
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -197,14 +198,14 @@ class Build(object):
     def __str__(self):
         return str(self.__dict__)
 
-    def get_project_root_from_source(self):
+    def get_project_root_from_source(self) -> str:
         if self.source['type'] == 'git':
             return os.path.basename(self.source['uri'].rstrip('/'))
         if self.source['type'] in ['directory', 'git_directory']:
             return os.path.basename(self.source['path'].rstrip('/'))
         return ''
 
-    def get_safe_dirname(self):
+    def get_safe_dirname(self) -> str:
         return re.sub(
             '[^A-Za-z0-9\.\-]',
             '_',
@@ -214,7 +215,7 @@ class Build(object):
         )
 
     @staticmethod
-    def _append_scripts_to_args(arguments):
+    def _append_scripts_to_args(arguments) -> str:
         fpm_args = arguments["fpm_args"]
 
         if arguments["package_tmp_root"] is None:
@@ -260,17 +261,17 @@ class Builder(object):
         self.local_profiles_dir = profiles_dir
         self._load_profiles()
 
-    def add_build(self, **kwargs):
+    def add_build(self, **kwargs) -> None:
         self.build = Build(**kwargs)
 
     # TODO: Possibly redundant with already existing code. REFACTOR
-    def _create_vdist_dir(self):
+    def _create_vdist_dir(self) -> None:
         vdist_path = os.path.join(os.path.expanduser('~'), '.vdist')
         if not os.path.exists(vdist_path):
             self.logger.info('Creating: %s' % vdist_path)
             os.mkdir(vdist_path)
 
-    def _add_profiles_from_file(self, config_file):
+    def _add_profiles_from_file(self, config_file) -> None:
         with open(config_file) as f:
             profiles = json.loads(f.read())
 
@@ -285,7 +286,7 @@ class Builder(object):
 
                 self.profiles[profile_id] = profile
 
-    def _load_profiles(self):
+    def _load_profiles(self) -> None:
         internal_profiles = os.path.join(
             os.path.dirname(__file__),
             'profiles', 'internal_profiles.json')
@@ -296,7 +297,7 @@ class Builder(object):
         if os.path.isfile(local_profiles):
             self._add_profiles_from_file(local_profiles)
 
-    def _render_template(self, build):
+    def _render_template(self, build) -> None:
         internal_template_dir = os.path.join(
             os.path.dirname(__file__), 'profiles')
 
@@ -324,20 +325,20 @@ class Builder(object):
             **build.__dict__
         )
 
-    def _clean_build_basedir(self):
+    def _clean_build_basedir(self) -> None:
         if os.path.exists(self.build_basedir):
             shutil.rmtree(self.build_basedir)
 
-    def _create_build_basedir(self):
+    def _create_build_basedir(self) -> None:
         os.mkdir(self.build_basedir)
 
     @staticmethod
-    def _write_build_script(path, script):
+    def _write_build_script(path, script) -> None:
         with open(path, 'w+') as f:
             f.write(script)
         os.chmod(path, 0o777)
 
-    def _populate_scratch_dir(self, build):
+    def _populate_scratch_dir(self, build) -> None:
         # write rendered build script to scratch dir
         self._write_build_script(
             os.path.join(build.scratch_dir, defaults.SCRATCH_BUILDSCRIPT_NAME),
@@ -363,7 +364,7 @@ class Builder(object):
                     os.path.join(build.scratch_dir, subdir)
                 )
 
-    def _create_build_dir(self, build):
+    def _create_build_dir(self, build) -> Tuple[str, str]:
         subdir_name = build.get_safe_dirname()
 
         build_dir = os.path.join(self.build_basedir, subdir_name)
@@ -379,7 +380,7 @@ class Builder(object):
 
         return build_dir, scratch_dir
 
-    def run_build(self):
+    def run_build(self) -> None:
         profile = self.profiles[self.build.profile]
 
         self.logger.info('launching docker image: %s' % profile.docker_image)
@@ -397,33 +398,33 @@ class Builder(object):
         self.logger.info('*** Resulting OS packages are in: %s ***'
                          % self.build.build_tmp_dir)
 
-    def get_available_profiles(self):
+    def get_available_profiles(self) -> Dict[str, BuildProfile]:
         self._load_profiles()
         return self.profiles
 
-    def start_build(self):
+    def start_build(self) -> None:
         self._create_vdist_dir()
         if self.build is None:
             raise NoBuildsFoundException()
         self.run_build()
 
-    def populate_build_folder_tree(self):
+    def populate_build_folder_tree(self) -> None:
         self._populate_scratch_dir(self.build)
 
-    def create_build_folder_tree(self):
+    def create_build_folder_tree(self) -> None:
         self._start_build_basedir()
         self._start_build_folders()
 
-    def _start_build_basedir(self):
+    def _start_build_basedir(self) -> None:
         self._clean_build_basedir()
         self._create_build_basedir()
 
-    def _start_build_folders(self):
+    def _start_build_folders(self) -> None:
         build_tmp_dir, scratch_dir = self._create_build_dir(self.build)
         self.build.build_tmp_dir = build_tmp_dir
         self.build.scratch_dir = scratch_dir
 
-    def copy_script_to_output_folder(self, _configuration):
+    def copy_script_to_output_folder(self, _configuration) -> None:
         source_folder = self.build.scratch_dir
         script_filepath = os.path.join(source_folder,
                                        defaults.SCRATCH_BUILDSCRIPT_NAME)
