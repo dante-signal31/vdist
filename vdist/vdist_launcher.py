@@ -5,9 +5,6 @@
 # after installing vdist package. If you try to run vdist_launcher.py directly
 # you are going to get ImportError unless you add vdist main folder (the
 # one with setup.py) to PYTHONPATH.
-
-# from __future__ import absolute_import
-
 import concurrent.futures as futures
 import contextlib
 import multiprocessing

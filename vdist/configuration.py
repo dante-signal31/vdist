@@ -1,12 +1,4 @@
-# from __future__ import absolute_import
-
-import string
-import sys
-# The ConfigParser module has been renamed to configparser in Python 3
-# if sys.version_info[0] == 3:
 import configparser
-# else:
-#     import ConfigParser as configparser
 from typing import Dict
 
 import vdist.defaults as defaults
@@ -91,11 +83,7 @@ def _remove_cr(text):
     # Great reference:
     #   http://stackoverflow.com/questions/3939361/remove-specific-characters-from-a-string-in-python
     #   http://stackoverflow.com/questions/21038891/what-does-table-in-the-string-translate-function-mean
-    # if sys.version_info[0] == 3:
-        return text.translate({ord('\n'): ord(' '), })
-    # else:
-    #     translation_table = string.maketrans('\n', ' ')
-    #     return text.translate(translation_table)
+    return text.translate({ord('\n'): ord(' '), })
 
 
 def read(configuration_file: str) -> Dict[str, Configuration]:
@@ -112,20 +100,12 @@ def read(configuration_file: str) -> Dict[str, Configuration]:
 
 
 def _get_section_values(parser, section):
-    # section_values = {}
-    # if sys.version_info[0] == 3:
     section_values = {key: parser[section][key]
                       for key in parser[section]}
-    # else:
-    #     section_values = {key: value
-    #                       for key, value in parser.items(section)}
     return section_values
 
 
 def _get_config_parser():
-    # if sys.version_info[0] == 3:
     parser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-    # else:
-    #     parser = configparser.ConfigParser()
     return parser
 
