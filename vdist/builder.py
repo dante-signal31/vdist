@@ -1,11 +1,11 @@
-from __future__ import absolute_import
+# from __future__ import absolute_import
 
 import logging
 import os
 import shutil
 import re
 import json
-import sys
+# import sys
 import tempfile
 from typing import Tuple, Dict
 
@@ -71,10 +71,10 @@ def _create_output_folder(_configuration: configuration.Configuration) -> None:
 
 
 def _create_folder(_configuration: configuration.Configuration) -> None:
-    if sys.version_info[0] == 3:
+    # if sys.version_info[0] == 3:
         os.makedirs(_configuration.output_folder, exist_ok=True)
-    else:
-        os.makedirs(_configuration.output_folder)
+    # else:
+    #     os.makedirs(_configuration.output_folder)
 
 
 # TODO: Possibly redundant with already existing code. REFACTOR

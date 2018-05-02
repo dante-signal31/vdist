@@ -1,5 +1,5 @@
 import os
-import sys
+# import sys
 
 PYTHON_BASEDIR = '/opt'
 PYTHON_VERSION = '2.7.9'
@@ -16,4 +16,4 @@ OUTPUT_FOLDER = "./"
 OUTPUT_SCRIPT = False
 BUILD_NAME = "Default project"
 
-PYTHON3_INTERPRETER = True if sys.version_info[0] == 3 else False
+# PYTHON3_INTERPRETER = True if sys.version_info[0] == 3 else False
