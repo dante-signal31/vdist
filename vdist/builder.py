@@ -42,7 +42,7 @@ def _generate_builder(_configuration: configuration.Configuration) -> 'Builder':
 
 # TODO: Possibly redundant with already existing code. REFACTOR
 def _get_script_output_filename(_configuration: configuration.Configuration) -> str:
-    script_filename = "{0}.sh".format(_get_package_folder_name(_configuration))
+    script_filename = f"{_get_package_folder_name(_configuration)}.sh"
     output_filepath = os.path.join(_configuration.output_folder,
                                    script_filename)
     return output_filepath
@@ -122,7 +122,7 @@ class BuildProfile(object):
         for attr in self.required_attrs:
             if not hasattr(self, attr):
                 raise AttributeError(
-                    'build profile misses attribute: %s' % attr)
+                    f'build profile misses attribute: {attr}')
         return True
 
     def __str__(self):
@@ -245,8 +245,7 @@ class Builder(object):
             process_name=defaults.BUILD_NAME,
             profiles_dir=defaults.LOCAL_PROFILES_DIR,
             machine_logs=True):
-        logging.basicConfig(format='%(asctime)s %(levelname)s '
-                            '[{0}] %(name)s %(message)s'.format(process_name),
+        logging.basicConfig(format=f'%(asctime)s %(levelname)s [{process_name}] %(name)s %(message)s',
                             level=logging.INFO)
         self.logger = logging.getLogger('Builder')
 
@@ -268,7 +267,7 @@ class Builder(object):
     def _create_vdist_dir(self) -> None:
         vdist_path = os.path.join(os.path.expanduser('~'), '.vdist')
         if not os.path.exists(vdist_path):
-            self.logger.info('Creating: %s' % vdist_path)
+            self.logger.info(f'Creating: {vdist_path}')
             os.mkdir(vdist_path)
 
     def _add_profiles_from_file(self, config_file) -> None:
@@ -308,7 +307,7 @@ class Builder(object):
 
         if build.profile not in self.profiles:
             raise BuildProfileNotFoundException(
-                'profile not found: %s' % build.profile)
+                f'profile not found: {build.profile}')
 
         profile = self.profiles[build.profile]
         template_name = profile.script
@@ -356,7 +355,7 @@ class Builder(object):
         if build.source['type'] in ['directory', 'git_directory']:
             if not os.path.exists(build.source['path']):
                 raise ValueError(
-                    'path does not exist: %s' % build.source['path'])
+                    f'path does not exist: {build.source["path"]}')
             else:
                 subdir = os.path.basename(build.source['path'])
                 _copytree(
@@ -383,20 +382,19 @@ class Builder(object):
     def run_build(self) -> None:
         profile = self.profiles[self.build.profile]
 
-        self.logger.info('launching docker image: %s' % profile.docker_image)
+        self.logger.info(f'launching docker image: {profile.docker_image}')
 
         build_machine = buildmachine.BuildMachine(
             image=profile.docker_image
         )
 
-        self.logger.info('Running build machine for: %s' % self.build.name)
+        self.logger.info(f'Running build machine for: {self.build.name}')
         build_machine.launch(build_dir=self.build.build_tmp_dir)
 
-        self.logger.info('Shutting down build machine: %s' % self.build.name)
+        self.logger.info(f'Shutting down build machine: {self.build.name}')
         build_machine.shutdown()
 
-        self.logger.info('*** Resulting OS packages are in: %s ***'
-                         % self.build.build_tmp_dir)
+        self.logger.info(f'*** Resulting OS packages are in: {self.build.build_tmp_dir} ***')
 
     def get_available_profiles(self) -> Dict[str, BuildProfile]:
         self._load_profiles()

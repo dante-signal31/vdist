@@ -43,10 +43,10 @@ def run_builds(configurations: Dict[str, configuration.Configuration]) -> None:
     with futures.ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
         workers = []
         for _configuration in configurations:
-            print("Starting building process for {0}".format(_configuration))
+            print(f"Starting building process for {_configuration}")
             worker = executor.submit(builder.build_package, configurations[_configuration])
             workers.append(worker)
-            print("Started building process for {0}".format(_configuration))
+            print(f"Started building process for {_configuration}")
         print_results(workers)
 
 
@@ -54,7 +54,7 @@ def print_results(workers: List[futures.Executor]) -> None:
     for future in futures.as_completed(workers):
         files_created = future.result()
         for worker_name, files in files_created.items():
-            print("Files created by {0}:".format(worker_name))
+            print(f"Files created by {worker_name}:")
             for file in files:
                 print(file)
 
@@ -64,7 +64,7 @@ def time_execution():
     start_time = time.time()
     yield
     execution_time = time.time() - start_time
-    print("Total execution time: {0} seconds".format(execution_time))
+    print(f"Total execution time: {execution_time} seconds")
 
 
 def main(args: List=sys.argv[1:]) -> None:
