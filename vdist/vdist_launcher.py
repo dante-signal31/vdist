@@ -5,14 +5,12 @@
 # after installing vdist package. If you try to run vdist_launcher.py directly
 # you are going to get ImportError unless you add vdist main folder (the
 # one with setup.py) to PYTHONPATH.
-
-from __future__ import absolute_import
-
 import concurrent.futures as futures
 import contextlib
 import multiprocessing
 import sys
 import time
+from typing import Dict, List
 
 import vdist.console_parser as console_parser
 import vdist.configuration as configuration
@@ -20,7 +18,7 @@ import vdist.defaults as defaults
 import vdist.builder as builder
 
 
-def _get_build_configurations(arguments):
+def _get_build_configurations(arguments: Dict[str, str]) -> Dict[str, configuration.Configuration]:
     try:
         if arguments["configuration_file"] is None:
             configurations = _load_default_configuration(arguments)
@@ -31,29 +29,29 @@ def _get_build_configurations(arguments):
     return configurations
 
 
-def _load_default_configuration(arguments):
+def _load_default_configuration(arguments: Dict[str, str]) -> Dict[str, configuration.Configuration]:
     arguments.name = defaults.BUILD_NAME
     _configuration = configuration.Configuration(arguments)
     configurations = {defaults.BUILD_NAME: _configuration, }
     return configurations
 
 
-def run_builds(configurations):
+def run_builds(configurations: Dict[str, configuration.Configuration]) -> None:
     with futures.ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
         workers = []
         for _configuration in configurations:
-            print("Starting building process for {0}".format(_configuration))
+            print(f"Starting building process for {_configuration}")
             worker = executor.submit(builder.build_package, configurations[_configuration])
             workers.append(worker)
-            print("Started building process for {0}".format(_configuration))
+            print(f"Started building process for {_configuration}")
         print_results(workers)
 
 
-def print_results(workers):
+def print_results(workers: List[futures.Executor]) -> None:
     for future in futures.as_completed(workers):
         files_created = future.result()
         for worker_name, files in files_created.items():
-            print("Files created by {0}:".format(worker_name))
+            print(f"Files created by {worker_name}:")
             for file in files:
                 print(file)
 
@@ -63,10 +61,10 @@ def time_execution():
     start_time = time.time()
     yield
     execution_time = time.time() - start_time
-    print("Total execution time: {0} seconds".format(execution_time))
+    print(f"Total execution time: {execution_time} seconds")
 
 
-def main(args=sys.argv[1:]):
+def main(args: List=sys.argv[1:]) -> None:
     with time_execution():
         console_arguments = console_parser.parse_arguments(args)
         configurations = _get_build_configurations(console_arguments)

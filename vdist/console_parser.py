@@ -1,8 +1,9 @@
 import argparse
 import os.path
+from typing import Dict
 
 
-def _check_is_file(_string):
+def _check_is_file(_string: str) -> str:
     if os.path.isfile(_string):
         return _string
     else:
@@ -11,7 +12,7 @@ def _check_is_file(_string):
 
 
 # TODO: Some defaults are redundant with defaults at object creation. Fix it.
-def parse_arguments(args=None):
+def parse_arguments(args: list=None) -> Dict[str, str]:
     arg_parser = argparse.ArgumentParser(description="A tool that lets you "
                                                      "create OS packages from "
                                                      "your Python applications "
