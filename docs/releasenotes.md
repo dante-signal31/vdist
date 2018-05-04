@@ -1,4 +1,7 @@
 ## Release notes
+### 1.4.1 (2018/05/04)
+- Removed some redundant code that caused a rare race condition at Travis-CI
+build stage.
 ### 1.4 (2018/04/28)
 - Inner docker engine has been refactored to use docker AOI instead of console
 commands. This way basecode is cleaner and easier to maintain.

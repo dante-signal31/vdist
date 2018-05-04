@@ -258,11 +258,11 @@ class Builder(object):
         self.build = Build(**kwargs)
 
     # TODO: Possibly redundant with already existing code. REFACTOR
-    def _create_vdist_dir(self) -> None:
-        vdist_path = os.path.join(os.path.expanduser('~'), '.vdist')
-        if not os.path.exists(vdist_path):
-            self.logger.info(f'Creating: {vdist_path}')
-            os.mkdir(vdist_path)
+    # def _create_vdist_dir(self) -> None:
+    #     vdist_path = os.path.join(os.path.expanduser('~'), '.vdist')
+    #     if not os.path.exists(vdist_path):
+    #         self.logger.info(f'Creating: {vdist_path}')
+    #         os.mkdir(vdist_path)
 
     def _add_profiles_from_file(self, config_file) -> None:
         with open(config_file) as f:
@@ -395,7 +395,7 @@ class Builder(object):
         return self.profiles
 
     def start_build(self) -> None:
-        self._create_vdist_dir()
+        # self._create_vdist_dir()
         if self.build is None:
             raise NoBuildsFoundException()
         self.run_build()
