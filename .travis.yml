@@ -97,7 +97,7 @@ jobs:
     python: 3.6
     if: branch = staging
     script:
-    - travis_wait 20 sudo ci_scripts/build_system_packages
+    - travis_wait 20 ci_scripts/build_system_packages
     - ci_scripts/tag_release
     - ci_scripts/create_bintray_descriptors_from_templates
     deploy:

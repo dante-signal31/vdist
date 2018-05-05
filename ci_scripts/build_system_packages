@@ -64,7 +64,8 @@ def _include_apt_source(source_url,
 
 
 def install_vdist():
-    print("Installing vdist package from Bintray...")
+    # print("Installing vdist package from Bintray...")
+    print("Installing vdist package from Pypi...")
     # tools.run_console_command("sudo apt-get update")
     # tools.run_console_command("sudo apt-get install vdist")
     tools.run_console_command("pip install vdist")
@@ -83,7 +84,14 @@ if __name__ == '__main__':
         print("This job is going to build vdist system packages.")
         # I'd like to install vdist from an apt repository because I feel
         # a deb package let me do a more proper dependency management. Problem
-        # is that linux version that Travis runs is rather old and uses a
+        # is that, to ease installation, I've set docker.io as dependency
+        # instead of docker-ce (harder to install) so Travis default
+        # docker-ce is overwritten by Travis Trusty's docker.io version which
+        # is rather old and incompatible with client module used by vdist.
+        # This does not happen in local tests because I use a newer Ubuntu
+        # that install a newer docker.io package too. So I've going to install
+        # vdist from Pypi until Travis updates its available Ubuntu versions.
+        # Good news are that vdist installation will be considerably quicker.
         # install_dependencies()
         # install_bintray_key()
         # check_bintray_in_apt_sources()
