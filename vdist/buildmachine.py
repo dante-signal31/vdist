@@ -13,7 +13,7 @@ class BuildMachine(object):
         self.logger = logging.getLogger('BuildMachine')
         self.image = image
         self.container = None
-        self.docker_client = docker.from_env()
+        self.docker_client = docker.from_env(version="auto")
 
     @staticmethod
     def _binds_to_shell_volumes(binds: Dict[str, str]) -> Dict[str, Dict[str, str]]:

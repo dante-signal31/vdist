@@ -2,6 +2,7 @@
 
 import os
 import sys
+import traceback
 if sys.version_info.major < 3:
     import ci_tools as tools
 else:
@@ -77,10 +78,17 @@ def build_packages():
 
 
 if __name__ == '__main__':
-    print("This job is going to build vdist system packages.")
-    install_dependencies()
-    install_bintray_key()
-    check_bintray_in_apt_sources()
-    install_vdist()
-    build_packages()
+    try:
+        print("This job is going to build vdist system packages.")
+        install_dependencies()
+        install_bintray_key()
+        check_bintray_in_apt_sources()
+        install_vdist()
+        build_packages()
+    except Exception:
+        traceback.print_stack()
+        sys.exit(1)
+    else:
+        sys.exit(0)
+
 
