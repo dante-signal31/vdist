@@ -1,4 +1,12 @@
 ## Release notes
+### 1.4.4 (2018/05/04)
+- Some build tasks were failing silently at Travis CI so I thought I was
+packaging properly releases when I actually wasn't. So I've made some
+changes to explicitely return error codes on exceptions to warn Travis
+about error conditions. Hopefully this will make Travis fail the job and
+stop it properly.
+### 1.4.3 (2018/05/04)
+- Fixed a problem related with a docker client version mismatch.
 ### 1.4.1 (2018/05/04)
 - Removed some redundant code that caused a rare race condition at Travis-CI
 build stage.

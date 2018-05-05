@@ -2,6 +2,7 @@
 
 import sys
 import tempfile
+import traceback
 
 if sys.version_info.major < 3:
     import ci_tools as tools
@@ -38,7 +39,13 @@ def push_to_origin(github_repo=GITHUB_REPO, github_token=GITHUB_TOKEN,
 
 
 if __name__ == '__main__':
-    with tempfile.TemporaryDirectory() as tempdir:
-        clone_repository(tempdir)
-        merge_with_production(tempdir)
-        push_to_origin()
+    try:
+        with tempfile.TemporaryDirectory() as tempdir:
+            clone_repository(tempdir)
+            merge_with_production(tempdir)
+            push_to_origin()
+    except Exception:
+        traceback.print_stack()
+        sys.exit(1)
+    else:
+        sys.exit(0)
