@@ -2,9 +2,10 @@
 # GENERAL CONFIGURATION
 ################################
 language: python
-dist: trusty
 # We are going to need a full-VM to run docker containers inside.
 sudo: enabled
+dist: trusty
+group: travis_latest
 # Vdist needs docker enabled to work.
 services:
 - docker
