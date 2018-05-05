@@ -10,6 +10,7 @@ import contextlib
 import multiprocessing
 import sys
 import time
+import traceback
 from typing import Dict, List
 
 import vdist.console_parser as console_parser
@@ -65,10 +66,16 @@ def time_execution():
 
 
 def main(args: List=sys.argv[1:]) -> None:
-    with time_execution():
-        console_arguments = console_parser.parse_arguments(args)
-        configurations = _get_build_configurations(console_arguments)
-        run_builds(configurations)
+    try:
+        with time_execution():
+            console_arguments = console_parser.parse_arguments(args)
+            configurations = _get_build_configurations(console_arguments)
+            run_builds(configurations)
+    except Exception:
+        traceback.print_stack()
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
 
 if __name__ == "__main__":
