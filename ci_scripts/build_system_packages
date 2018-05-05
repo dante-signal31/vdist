@@ -65,8 +65,9 @@ def _include_apt_source(source_url,
 
 def install_vdist():
     print("Installing vdist package from Bintray...")
-    tools.run_console_command("sudo apt-get update")
-    tools.run_console_command("sudo apt-get install vdist")
+    # tools.run_console_command("sudo apt-get update")
+    # tools.run_console_command("sudo apt-get install vdist")
+    tools.run_console_command("pip install vdist")
     print("vdist installed.")
 
 
@@ -80,9 +81,12 @@ def build_packages():
 if __name__ == '__main__':
     try:
         print("This job is going to build vdist system packages.")
-        install_dependencies()
-        install_bintray_key()
-        check_bintray_in_apt_sources()
+        # I'd like to install vdist from an apt repository because I feel
+        # a deb package let me do a more proper dependency management. Problem
+        # is that linux version that Travis runs is rather old and uses a
+        # install_dependencies()
+        # install_bintray_key()
+        # check_bintray_in_apt_sources()
         install_vdist()
         build_packages()
     except Exception:
