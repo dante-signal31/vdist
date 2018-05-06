@@ -1,17 +1,19 @@
 ## Release notes
-### 1.4.4 (2018/05/04)
+### 1.4.8 (2018/05/06)
+- Travis build scripts habe been refactored to install vdist on Travis
+from Pypi. That way I fixed some compatibility issues between docker
+client library and docker server that is installed in Travis Ubuntu
+version. Good news are that now Travis build step is some minutes 
+shorter.
 - Some build tasks were failing silently at Travis CI so I thought I was
 packaging properly releases when I actually wasn't. So I've made some
 changes to explicitely return error codes on exceptions to warn Travis
 about error conditions. Hopefully this will make Travis fail the job and
 stop it properly.
-### 1.4.3 (2018/05/04)
 - Fixed a problem related with a docker client version mismatch.
-### 1.4.1 (2018/05/04)
 - Removed some redundant code that caused a rare race condition at Travis-CI
 build stage.
-### 1.4 (2018/04/28)
-- Inner docker engine has been refactored to use docker AOI instead of console
+- Inner docker engine has been refactored to use docker API instead of console
 commands. This way basecode is cleaner and easier to maintain.
 - Since Python 2.7 is now longer a supported platform for vdist, all
 inner python 2 code has been removed. That way code should be easier
