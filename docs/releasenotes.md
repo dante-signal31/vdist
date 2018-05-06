@@ -1,4 +1,8 @@
 ## Release notes
+### 1.4.9 (2018/05/06)
+- Minor changes to improve the way exceptions are printed out in some
+points of base code.
+
 ### 1.4.8 (2018/05/06)
 - Travis build scripts habe been refactored to install vdist on Travis
 from Pypi. That way I fixed some compatibility issues between docker
