@@ -46,8 +46,8 @@ if __name__ == '__main__':
         current_version = tools.get_current_version(VDIST_CONFIGURATION)
         for template_name, template_content in templates.items():
             create_descriptor(template_name, template_content, current_version)
-    except Exception:
-        traceback.print_stack()
+    except:
+        traceback.print_exc(file=sys.stdout)
         sys.exit(1)
     else:
         sys.exit(0)

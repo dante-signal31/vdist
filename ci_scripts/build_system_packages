@@ -97,8 +97,8 @@ if __name__ == '__main__':
         # check_bintray_in_apt_sources()
         install_vdist()
         build_packages()
-    except Exception:
-        traceback.print_stack()
+    except:
+        traceback.print_exc(file=sys.stdout)
         sys.exit(1)
     else:
         sys.exit(0)

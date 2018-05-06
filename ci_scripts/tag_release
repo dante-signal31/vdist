@@ -31,8 +31,8 @@ if __name__ == '__main__':
     try:
         set_contact_data(GIT_USERNAME, GIT_EMAIL)
         set_version_tag(VERSION_PREFIX)
-    except Exception:
-        traceback.print_stack()
+    except:
+        traceback.print_exc(file=sys.stdout)
         sys.exit(1)
     else:
         sys.exit(0)

@@ -44,8 +44,8 @@ if __name__ == '__main__':
             clone_repository(tempdir)
             merge_with_production(tempdir)
             push_to_origin()
-    except Exception:
-        traceback.print_stack()
+    except:
+        traceback.print_exc(file=sys.stdout)
         sys.exit(1)
     else:
         sys.exit(0)

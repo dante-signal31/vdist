@@ -72,7 +72,7 @@ def main(args: List=sys.argv[1:]) -> None:
             configurations = _get_build_configurations(console_arguments)
             run_builds(configurations)
     except Exception:
-        traceback.print_stack()
+        traceback.print_exc(file=sys.stdout)
         sys.exit(1)
     else:
         sys.exit(0)
