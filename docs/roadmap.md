@@ -7,3 +7,4 @@
 - Create profile for Fedora.
 - Create profile for Suse.
 - Update profile for Ubuntu.
+- Package private git repositories.
