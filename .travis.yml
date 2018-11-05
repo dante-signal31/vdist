@@ -4,7 +4,7 @@
 language: python
 # We are going to need a full-VM to run docker containers inside.
 sudo: enabled
-dist: trusty
+dist: xenial
 group: travis_latest
 # Vdist needs docker enabled to work.
 services:
