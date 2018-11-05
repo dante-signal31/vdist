@@ -20,6 +20,9 @@ yum install -y {{build_deps|join(' ')}}
 {% if compile_python %}
 # Download and compile what is going to be the Python we are going to use
 # as our portable python environment.
+    # Since Python 3.7 you need libffi to compile it.
+    yum update
+    yum install libffi-dev
     cd /var/tmp
     curl -O https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz
     tar xzvf Python-$PYTHON_VERSION.tgz
