@@ -1,4 +1,8 @@
 ## Release notes
+### 1.5.0 (2018/11/05)
+- Since Python 3.7 you need to add libffi-dev package to compile distribution. I 
+added tis installation in every profile.
+
 ### 1.4.9 (2018/05/06)
 - Minor changes to improve the way exceptions are printed out in some
 points of base code.
