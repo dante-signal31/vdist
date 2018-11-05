@@ -4,7 +4,7 @@
 language: python
 # We are going to need a full-VM to run docker containers inside.
 sudo: enabled
-dist: xenial
+dist: trusty
 group: travis_latest
 # Vdist needs docker enabled to work.
 services:
@@ -16,7 +16,8 @@ services:
 ################################
 python:
 #- 2.7
-- 3.7
+- 3.6
+- 3.7.1
 - nightly
 env:
  global:
@@ -30,7 +31,7 @@ matrix:
   # Actually I only build with latest stable python release, but I want
   # to be aware in advance if any dev python version is going to crash
   # my future builds.
-  - python: nightly
+  - python: 3.7.1 nightly
 
 
 ################################
@@ -75,13 +76,13 @@ jobs:
   include:
   # Update master branch.
   - stage: Branch merge to production branch
-    python: 3.7
+    python: 3.6
     if: branch = staging
     script:
     - ci_scripts/merge_with_production
   # Upload packages to Python Package Index.
   - stage: Pypi deployment
-    python: 3.7
+    python: 3.6
     script: echo "Deploying to Python Package Index..."
     deploy:
     - provider: pypi
@@ -94,7 +95,7 @@ jobs:
         branch: staging
   # Build DEB and RPM packages and upload them to Github and Bintray.
   - stage: System packages deployment
-    python: 3.7
+    python: 3.6
     if: branch = staging
     script:
     - travis_wait 20 ci_scripts/build_system_packages

@@ -13,7 +13,7 @@ fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     --license MIT --category net
 requirements_path = ./requirements.txt
 compile_python = True
-python_version = 3.7.1
+python_version = 3.6.5
 output_folder = ./package_dist/
 after_install = packaging/postinst.sh
 after_remove = packaging/postuninst.sh
