@@ -87,6 +87,7 @@ def _copytree(src: str, dst: str, symlinks: bool=False, ignore: bool=None) -> No
         if os.path.isdir(s):
             shutil.copytree(s, d, symlinks, ignore)
         else:
+            os.makedirs(os.path.dirname(d), exist_ok=True)
             shutil.copy2(s, d)
 
 
