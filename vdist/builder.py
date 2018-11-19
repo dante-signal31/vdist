@@ -79,7 +79,7 @@ def _get_package_folder_name(_configuration: configuration.Configuration) -> str
 
 # Standard shutil.copytree has problems copying into an already populated
 # folder, like we do with vdist. Workaround found here:
-#     https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
+#     https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-python
 def _copytree(src: str, dst: str, symlinks: bool=False, ignore: bool=None) -> None:
     for item in os.listdir(src):
         s = os.path.join(src, item)
