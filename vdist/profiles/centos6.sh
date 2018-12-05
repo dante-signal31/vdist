@@ -8,7 +8,7 @@ set -e
 
 {% if build_deps %}
 # Refresh repositories list to avoid problems with too old databases.
-yum update
+yum update -y
 # Install build dependencies.
 yum install -y {{build_deps|join(' ')}}
 {% endif %}
@@ -21,7 +21,7 @@ yum install -y {{build_deps|join(' ')}}
 # Download and compile what is going to be the Python we are going to use
 # as our portable python environment.
     # Since Python 3.7 you need libffi to compile it.
-    yum update
+    yum update -y
     yum install libffi-dev -y
     cd /var/tmp
     curl -O https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz
