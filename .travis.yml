@@ -15,7 +15,6 @@ services:
 # TEST MATRIX
 ################################
 python:
-#- 2.7
 - 3.6
 - 3.7.1
 - nightly
@@ -24,7 +23,7 @@ env:
  - secure: "Ig3i1GxGTxz+J1LR46cmkkWzpHBUsUVpTVJZ5nyrH6781eoQmZStNfBdmn32MogumbyTnQzUEtWHEdAMErwtmOcCOo0LkrHKYNlJopVA06NwO7+IO8FGpSEydeMYFMsWdEO8Hg2vk/xr+K7UjVcJvG0usPxpEpIE17abif64mnDJXuB3VHchi/0I1BYimnmXVVFh93A+xOdXxbYjnPCDSQQ+f85NqTyMw1aTCkYuqG1XOZBdrO0rGd8McHjdbwLFOmN0Ve6SaollosztA/AgI5VcfsCn4tlSpg6DmY976QWkWchVVQI33vJEYGXiA4VFLzfGJsobQQZHuAieLBsvgj3Lz8OVVItnIPYVOcJ1qDbQP09VZKxFo9zDajJq1169oYSFlOj/0KrHJYEIGHwk+kwBWn6THdnadY8qeko1TEdWfrsgn3gmCUK9njQCA5UJM+7dPTWTE++fSBc0dZqXLV8ooPJ7ZjCMX7BCG0PR9Sr2PRLwOFtGYpWzdu4hIM8r8TBLZfo85LcGwa+mhOtfD+bdxCoYyvsmQzgGpcVWqJc76WuvemHSjmpV08mKu3UHyRPrmUP2yrD700u05kj9G6mpu0ZGzQgq567YaUy/jaQp2esNNhZ4PNdDvKtatUDY7OQ9RXguNKSYNI+b+7IgDdK3vQ4uCBMjDP4F1VEulJ0="
  matrix:
   - TEST_TAG="test_generate_deb"
-  - TEST_TAG="centos6"
+#  - TEST_TAG="centos6"
   - TEST_TAG="centos7"
 matrix:
   allow_failures:
@@ -64,9 +63,8 @@ install:
   - pip install -r requirements.txt
 script:
   # Seems that centos7 tests fail if I don't give them additional time.
-#   - if [[ $TEST_TAG = "centos7" ]]; then travis_wait 30 pytest -v -rs -k $TEST_TAG; else pytest -v -rs -k $TEST_TAG; fi
   - travis_wait 50 pytest -v -rs -k $TEST_TAG
-#  - echo "Dummy test"
+
 
 
 
