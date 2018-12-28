@@ -6,9 +6,11 @@ import traceback
 
 if sys.version_info.major < 3:
     import ci_tools as tools
+    import tag_release as tag
     from .ci_constants import *
 else:
     from ci_scripts import ci_tools as tools
+    from ci_scripts import tag_release as tag
     from ci_scripts.ci_constants import *
 
 
@@ -43,6 +45,8 @@ if __name__ == '__main__':
         with tempfile.TemporaryDirectory() as tempdir:
             clone_repository(tempdir)
             merge_with_production(tempdir)
+            tag.set_contact_data(GIT_USERNAME, GIT_EMAIL)
+            tag.set_version_tag(VERSION_PREFIX)
             push_to_origin()
     except:
         traceback.print_exc(file=sys.stdout)
