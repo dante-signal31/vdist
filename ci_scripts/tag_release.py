@@ -26,6 +26,7 @@ def set_version_tag(prefix):
     tools.run_console_command("git tag '{0}'".format(version_string))
     # tools.run_console_command("git push origin '{0}'".format(version_string))
     print("Tag set.")
+    return version_string
 
 # To make just one push, now tagging is called from merge_with_production_script.
 #
