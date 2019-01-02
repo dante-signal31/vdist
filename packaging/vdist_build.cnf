@@ -20,7 +20,7 @@ after_remove = packaging/postuninst.sh
 
 [Ubuntu-package]
 profile = ubuntu-trusty
-runtime_deps = libssl1.0.0, docker.io
+runtime_deps = libssl1.0.0, docker-ce
 
 [Centos7-package]
 profile = centos7
