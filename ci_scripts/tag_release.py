@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-import traceback
 if sys.version_info.major < 3:
     import ci_tools as tools
     from .ci_constants import *
@@ -24,18 +23,5 @@ def set_version_tag(prefix):
     version = tools.get_current_version(VDIST_CONFIGURATION)
     version_string = "{0}{1}".format(prefix, version)
     tools.run_console_command("git tag '{0}'".format(version_string))
-    # tools.run_console_command("git push origin '{0}'".format(version_string))
     print("Tag set.")
     return version_string
-
-# To make just one push, now tagging is called from merge_with_production_script.
-#
-# if __name__ == '__main__':
-#     try:
-#         set_contact_data(GIT_USERNAME, GIT_EMAIL)
-#         set_version_tag(VERSION_PREFIX)
-#     except:
-#         traceback.print_exc(file=sys.stdout)
-#         sys.exit(1)
-#     else:
-#         sys.exit(0)
