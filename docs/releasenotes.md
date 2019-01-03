@@ -1,7 +1,14 @@
 ## Release notes
-### 1.5.0 (2018/11/05)
+### 1.6.0 (2019/01/02)
+- Debian packages now depends on official docker-ce packages and not on docker.io.
+
+### 1.5.8 (2018/12/28)
 - Since Python 3.7 you need to add libffi-dev package to compile distribution. I 
 added this installation in every profile.
+- I've changed Travis CI configuration for vdist building:
+    - Centos profiles were giving me many headaches. Their dependencies were so difficult to accomplish that I've dropped support for Centos 6.
+    - Even in Centos 7 I've split my tests in several batches to not to get timeouts at Travis.
+    - I've improved the way I pushed tags to Github.
 
 ### 1.4.9 (2018/05/06)
 - Minor changes to improve the way exceptions are printed out in some

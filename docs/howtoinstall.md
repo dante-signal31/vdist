@@ -13,13 +13,36 @@ executable will be placed in virtualenv's bin folder).
 
 ### Install in Ubuntu using deb package
 You can download a deb package from [releases](https://github.com/dante-signal31/vdist/releases)
-section of vdist GitHub page. To install it locally resolving dependencies type:
+section of vdist GitHub page. Be aware that vdist depends on docker-ce package
+that it is not available in standard ubuntu repositories. So you should [add
+docker repositories](https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-repository) 
+before installing vdist:
+```
+$ sudo apt-get update
+$ sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo apt-key fingerprint 0EBFCD88
+
+    pub   4096R/0EBFCD88 2017-02-22
+          Key fingerprint = 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88
+    uid                  Docker Release (CE deb) <docker@docker.com>
+    sub   4096R/F273FCD8 2017-02-22
+    
+$ sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+```
+To install it locally resolving dependencies type:
 ```
 $ sudo apt-get update
 $ sudo dpkg -i <vdist_deb_package>.deb
 $ sudo apt-get -f install
 ```
-
 Alternatively, you can configure vdist's apt repository and download package
 from there. This is the preferred way of installation because using apt
 repository has the benefit of continuous updates so you
