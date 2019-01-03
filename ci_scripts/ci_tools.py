@@ -1,4 +1,5 @@
 # Common functions used by ci scripts.
+import os
 import sys
 import subprocess
 if sys.version_info.major < 3:
@@ -12,6 +13,14 @@ def get_current_version(configuration_file):
     parser.read(configuration_file)
     version = _get_version(parser)
     return version
+
+
+def get_environment_value(variable_name):
+    return os.environ[variable_name]
+
+
+def set_environment_value(variable_name, variable_value):
+    os.environ[variable_name] = variable_value
 
 
 def _get_config_parser():

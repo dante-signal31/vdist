@@ -5,7 +5,7 @@ RUN set -e
 # Install build tools.
 RUN yum -y update
 RUN yum groupinstall -y "Development Tools"
-RUN yum install -y ruby-devel curl libyaml-devel which tar rpm-build rubygems git python-setuptools zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel gcc gcc-c++
+RUN yum install -y ruby-devel curl libyaml-devel which tar rpm-build rubygems git python-setuptools zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel gcc gcc-c++ libffi-devel
 RUN yum install -y yum-utils
 # Python 3 RPM installation to get basic support in that Python version.
 # Idea taken from: http://stackoverflow.com/questions/8087184/problems-installing-python3-on-rhel
