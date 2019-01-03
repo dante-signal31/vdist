@@ -1,4 +1,7 @@
 ## Release notes
+### 1.7.0 (2018/11/03)
+- Manpage is now available. Just type "man vdist" and you'll get usage help.
+
 ### 1.5.0 (2018/11/05)
 - Since Python 3.7 you need to add libffi-dev package to compile distribution. I 
 added this installation in every profile.
