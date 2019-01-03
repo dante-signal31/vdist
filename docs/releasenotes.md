@@ -1,4 +1,9 @@
 ## Release notes
+### 1.6.1 (2019/01/03)
+- Libffi installation moved to docker images. As they are now preinstalled they
+are not needed to be downloaded and installed at building time so this one is 
+faster.
+ 
 ### 1.5.0 (2018/11/05)
 - Since Python 3.7 you need to add libffi-dev package to compile distribution. I 
 added this installation in every profile.
