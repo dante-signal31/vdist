@@ -106,6 +106,7 @@ jobs:
       - ci_scripts/create_postinst_script
       - travis_wait 20 ci_scripts/build_system_packages
       - ci_scripts/create_bintray_descriptors_from_templates
+      - ci_scripts/tag_release
     deploy:
     # Github Releases.
     - provider: releases
