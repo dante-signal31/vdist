@@ -49,6 +49,7 @@ if __name__ == '__main__':
             merge_with_production(tempdir)
             tag.set_contact_data(GIT_USERNAME, GIT_EMAIL)
             version_string = tag.set_version_tag(VERSION_PREFIX)
+            tools.set_environment_value("TRAVIS_TAG", version_string)
             push_to_origin(version=version_string)
     except:
         traceback.print_exc(file=sys.stdout)
