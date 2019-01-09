@@ -1,0 +1,307 @@
+.TH vdist 1
+
+.SH NAME
+vdist \- Create OS packages from Python projects using Docker containers
+
+.SH SYNOPSYS
+.B vdist
+batch CONFIGURATION FILE
+
+.SH DESCRIPTION
+\fBvdist\fR is a tool that lets you create OS packages from your Python applications in a clean and self contained manner.
+It uses virtualenv, Docker and fpm under the hood, and it uses Jinja2 to render its templates (shell scripts) for each
+individual target OS.
+.PP
+To use vdist you only need to create a configuration file to put all parameter for all packages you want to generate.
+.PP
+A typical vdist configuration file could be like this:
+.PP
+.nf
+.RS
+[DEFAULT]
+app = geolocate
+version = 1.3.0
+source_git = https://github.com/dante-signal31/${app}, master
+fpm_args = --maintainer dante.signal31@gmail.com -a native --url
+    https://github.com/dante-signal31/${app} --description
+    "This program accepts any text and searchs inside every IP
+    address. With each of those IP addresses,
+    ${app} queries
+    Maxmind GeoIP database to look for the city and
+    country where
+    IP address or URL is located. Geolocate is designed to be
+    used in console with pipes and redirections along with
+    applications like traceroute, nslookup, etc."
+    --license BSD-3 --category net
+requirements_path = /REQUIREMENTS.txt
+runtime_deps = libssl1.0.0, dummy1.0.0
+compile_python = True
+python_version = 3.4.4
+output_folder = ./vdist
+after_install = packaging/postinst.sh
+after_remove = packaging/postuninst.sh
+
+[Ubuntu-package]
+profile = ubuntu-trusty
+
+[Centos7-package]
+profile = centos7
+.RE
+.fi
+.PP
+Running vdist with that configuration file will place generated packages at path you set in \fBoutput_folder\fR variable.
+If you don't use absolute path but a relative one, then reference folder is the one where you are when vdist command is
+called. \fIAlways\fR set \fBoutput_folder\fR variable.
+.PP
+There can be many sections in every configuration file but all of them should have a [DEFAULT] section. You can name
+each section as you want but [DEFAULT] should always exists in your configurations because, as its name suggest, it
+contains default values that will apply to all of your packages unless one of the sections overrides any of the default
+values. Write a section for every package you want to create.
+.PP
+You can use tags in your configurations. In previous example \fB${app}\fR tag pastes the value you set in app variable.
+You can cross-reference values from specific sections using tags with format \fBS{section:variable}\fR, but if you you
+don't specify a section variable is fetched from current section and probably from default one.
+.PP
+You can put your configuration file whatever name and extension you want.
+.PP
+Once you have a configuration file you can launch vdist from your console using \fIbatch mode\fR:
+.PP
+.nf
+.RS
+$ vdist batch configuration_file
+.RE
+.fi
+.PP
+Batch mode is the usual mode your are going to use through console but vdist offers a \fImanual mode\fR too. That mode
+does not use a configuration file but allows you to set parameters as command arguments:
+.PP
+.nf
+.RS
+$ vdist manual --app geolocate --version 1.3.0 --source_git https://github.com/dante-signal31/geolocate,master
+--profile ubuntu-trusty --compile_python --python_version 3.4.4 --fpm_args '--maintainer dante.signal31@gmail.com
+-a native --url https://github.com/dante-signal31/geolocate --description "This program accepts any text and searchs
+inside every IP address." --license BSD-3 --category net' --requirements_path /REQUIREMENTS.txt --runtime_deps
+libssl1.0.0 dummy1.0.0 --output_folder ./dist --after_install = packaging/postinst.sh
+--after_remove = packaging/postuninst.sh
+.RE
+.fi
+.PP
+Pay attention to the point that \fB--fpm_args\fR argument is enclosed in single quotes.
+.PP
+Manual mode may be useful to dinamically set parameters through console scripts.
+.PP
+Whatever mode you use you can call console help anytime:
+.nf
+.RS
+$ vdist --help
+[...]
+
+$ vdist batch --help
+[...]
+
+$ vdist manual --help
+[...]
+.RE
+.fi
+.PP
+At \fI"Required arguments"\fR and \fI"Optional arguments"\fRsections, below in this very text, you can find a list of parameters
+you can set in your configuration file or through console manual parameters.
+
+.SH REQUIRED ARGUMENTS
+.PP
+First flag is for configuration files and second one for manual parameters:
+.TP
+\fBapp, --app\fR
+The name of the application to build; this should also equal the project name in Git, and is used as the prefix for
+the filename of the resulting package.
+.TP
+\fBversion, --version\fR
+The version of the application; this is used when building the OS package both in the name and in its meta information.
+.TP
+\fBprofile, --profile\fR
+The name of the profile to use for this specific build; its value should be one of two things:
+.RS
+.IP \[bu] 2
+A vdist built-in profile (for instance \fIcentos\fR or \fIubuntu-trusty\fR).
+.IP \[bu] 2
+A custom profile that you create yourself; see \fI"How to customize"\fR for instructions.
+.RE
+.TP
+\fBsource, --source\fR
+The argument that specifies how to get the source code to build from; the available source types are:
+.RS
+.IP \[bu] 2
+\fIgit(uri=uri, branch=branch)\fR: this source type attempts to git clone by using the supplied arguments.
+.IP \[bu] 2
+\fIdirectory(path=path)\fR: this source type uses a local directory to build the project from, and uses no versioning
+data.
+.IP \[bu] 2
+\fIgit_directory(path=path, branch=branch)\fR: this source type uses a git checkout in a local directory to build the project
+from; it checks out the supplied branch before building.
+.RE
+
+.SH OPTIONAL ARGUMENTS
+.PP
+First flag is for configuration files and second one for manual parameters:
+.TP
+\fBname, --name\fR
+The name of the build; this does not do anything in the build process itself, but is used in e.g. logs; when omitted,
+the build name is a sanitized combination of the \fBapp\fR, \fBversion\fR and \fBprofile\fI arguments.
+.TP
+\fBbuild_deps, --build_deps\fR
+A list of build time dependencies; these are the names of the OS packages that need to be present on the build machine
+before setting up and building the project.
+.TP
+\fBruntime_deps, --runtime_deps\fR
+a list of run time dependencies; these names are given to the resulting OS package as dependencies, so that they act as
+prerequisites when installing the final OS package.
+.TP
+\fBcustom_filename, --custom_filename\fR
+Specifies a custom filename to use when generating the OS package; within this filename, references to environment
+variables may be used when put in between curly braces (e.g. foo-{ENV_VAR_ONE}-bar-{ENV_VAR_TWO}.deb); this is useful
+when for example your CI system passes values such as the build number and so on.
+.TP
+\fBfpm_args, --fpm_args\fR
+Any extra arguments that are given to fpm when the actual package is being built.
+.TP
+\fBpip_args, --pip_args\fR
+Any extra arguments that are given to pip when your pip requirements are being installed (a custom index url pointing
+to your private PyPI repository for example).
+.TP
+\fBpackage_install_root, --package_install_root\fR
+Base directory were this package is going to be installed in target system (defaults to \fBpython_basedir\fI).
+.TP
+\fBpackage_tmp_root, --package_tmp_root\fR
+Temporal folder used in docker container to build your package (defaults to '/tmp').
+.TP
+\fBworking_dir, --working_dir\fR
+A subdirectory under your source tree that is to be regarded as the base directory; if set, only this directory is
+packaged, and the pip requirements are tried to be found here. This makes sense when you have a source repository with
+multiple projects under it.
+.TP
+\fBpython_basedir, --python_basedir\fR
+specifies one of two things: 1) where Python can be found (your company might have a prepackaged Python already
+installed on your custom docker container) 2) where vdist should install the compiled Python distribution on your docker
+container. Read vdist's various use cases to understand the nuance. Defaults to '/opt'.
+.TP
+\fBcompile_python, --compile_python\fR
+Indicates whether Python should be fetched from python.org, compiled and shipped for you; defaults to True. If not True
+then \fBpython_basedir\fR should point to a python distribution already installed in docker container.
+.TP
+\fBpython_version, --python_version\fR
+Specifies two things: 1) if 'compile_python' is True then it means the exact python version that should be downloaded
+and compiled. 2) if 'compile_python' is False then only mayor version number is considered (currently 2 or 3) and
+latest available python distribution of that mayor version is searched (in given 'python_basedir' of your docker
+container) to be used. Defaults to '2.7.9'.
+.TP
+\fBrequirements_path, --requirements_path\fR
+The path to your pip requirements file, relative to your project root; this defaults to \fI/requirements.txt\fR.
+.TP
+\fBafter_install, --after_install\fR
+A script to include inside package to be run after package installation. Given path should be given relative to the
+root of your source project folder.
+.TP
+\fBbefore_install, --before_install\fR
+A script to include inside package to be run before package installation. Given path should be given relative to the
+root of your source project folder.
+.TP
+\fBafter_remove, --after_remove\fR
+A script to include inside package to be run after package removal. Given path should be given relative to the root of
+your source project folder.
+.TP
+\fBbefore_remove, --before_remove\fR
+A script to include inside package to be run before package removal. Given path should be given relative to the root of
+your source project folder.
+.TP
+\fBafter_upgrade, --after_upgrade\fR
+A script to include inside package to be run after package upgrade. Given path should be given relative to the root of
+your source project folder.
+.TP
+\fBbefore_upgrade, --before_upgrade\fR
+A script to include inside package to be run before package upgrade. Given path should be given relative to the root of
+your source project folder.
+
+.SH EXAMPLES
+.PP
+Here's a quickstart to give you an idea of how to use vdist, once you're set up. First create a configuration file like this:
+.PP
+.nf
+.RS
+[DEFAULT]
+app = yourapp
+version = 1.0
+source_git = https://github.com/you/%(app)s, master
+compile_python = True
+python_version = 3.4.4
+requirements_path = ./requirements.txt
+build_deps = package1, package2
+runtime_deps = package3, package4
+output_folder = ./generated_packages_folder
+after_install = packaging/postinst.sh
+after_remove = packaging/postuninst.sh
+
+[Ubuntu-package]
+profile = ubuntu-trusty
+
+[Centos7-package]
+profile = centos7
+.RE
+.fi
+.PP
+Let guess that configuration file is called \fIyourapp_vdist.cnf\fR. Give that file to vdist launcher running next command:
+.PP
+.nf
+.RS
+$ \fBvdist batch\fR yourapp_vdist.cnf
+.RE
+.fi
+.PP
+Running the above would do this:
+.PP
+.nr step 1 1
+.IP \n[step] 3
+Set up a Docker container running Ubuntu Trusty Tahr.
+.IP \n+[step]
+Install the OS packages listed in \fBbuild_deps\fR.
+.IP \n+[step]
+Download and compile a python interpreter framework.
+.IP \n+[step]
+Git clone the repository at \fIhttps://github.com/you/yourapp\fR
+.IP \n+[step]
+checkout the branch \fI'master'\fR.
+.IP \n+[step]
+Install your application's dependencies from \fIrequirements.txt\fR if found in the checked out branch into compiled python framework.
+.IP \n+[step]
+If your application includes a \fIsetup.py\fR then it is installed in compiled python framework.
+.IP \n+[step]
+Wrap the compiled python framework and your application files in a package called \fIyourapp-1.0.deb\fR which includes a dependency on the OS packages listed in \fBruntime_deps\fR.
+.IP \n+[step]
+Repeat sequence setting up a Docker container running Centos 7.
+.IP \n+[step]
+In the end you'll find generated packages for ubuntu and centos 7 in \fBgenerated_packages_folder\fR.
+
+.SH AUTHOR
+Written by Dante Signal31 <dante.signal31@gmail.com>.
+
+.SH REPORTING BUGS
+vdist is currently in beta stage, but it should work just fine. If you find any issues, please report issues or submit
+pull requests via Github <https://github.com/dante-signal31/coko/issues>
+
+.SH COPYRIGHT
+Copyright 2018 Dante Signal31 <dante.signal31@gmail.com>
+.PP
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+.PP
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
+.PP
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+.SH SEE ALSO
+Website: <https://github.com/dante-signal31/vdist>
