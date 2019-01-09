@@ -1,5 +1,6 @@
 FROM ubuntu:trusty
-MAINTAINER dante-signal31 (dante.signal31@gmail.com)
+LABEL maintainer="dante-signal31 (dante.signal31@gmail.com)"
+LABEL description="Image to be used by vdist to package python applications into ubuntu deb packages."
 # Abort on error.
 RUN set -e
 # Sometimes deb-src repositories comes disabled by default, we're activating it

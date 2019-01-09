@@ -1,5 +1,6 @@
 FROM centos:centos7
-MAINTAINER dante-signal31 (dante.signal31@gmail.com)
+LABEL maintainer="dante-signal31 (dante.signal31@gmail.com)"
+LABEL description="Image to be used by vdist to package python applications into centos rpm packages."
 # Abort on error.
 RUN set -e
 # Install build tools.
