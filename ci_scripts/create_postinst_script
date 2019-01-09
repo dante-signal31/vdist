@@ -18,7 +18,7 @@ SCRIPT_TEXT = "#!/usr/bin/env bash\n\n " \
               "# Link geolocate executable from /usr/bin.\n" \
               "ln -s /opt/vdist/bin/vdist /usr/bin/vdist\n\n" \
               "# Copy man page to /usr/share/man/man1\n" \
-              "cp /opt/vdist/lib/python{python_version}/site-packages/vdist-{app_version}-py{python_version}.egg/share/man/man1/{app_name}.1 " \
+              "cp /opt/vdist/lib/python{python_version}/site-packages/vdist-{app_version}-py{python_version}.egg/share/man/man1/{app_name}.1.gz " \
               "/usr/share/man/man1/.\n"""
 
 if __name__ == '__main__':

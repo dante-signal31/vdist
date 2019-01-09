@@ -103,6 +103,7 @@ jobs:
     python: 3.6
     if: branch = staging
     script:
+      - gzip man/vdist.1
       - ci_scripts/create_postinst_script
       - travis_wait 20 ci_scripts/build_system_packages
       - ci_scripts/create_bintray_descriptors_from_templates
