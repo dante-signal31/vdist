@@ -11,6 +11,10 @@
         "docker_image": "dantesignal31/vdist-aux:ubuntu-trusty",
         "script": "debian.sh"
     },
+    "ubuntu-lts": {
+        "docker_image": "dantesignal31/vdist-aux:ubuntu-lts",
+        "script": "debian.sh"
+    },
     "debian-wheezy": {
         "docker_image": "dantesignal31/vdist-aux:debian:wheezy",
         "script": "debian.sh"

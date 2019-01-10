@@ -44,7 +44,7 @@ after_install = packaging/postinst.sh
 after_remove = packaging/postuninst.sh
 
 [Ubuntu-package]
-profile = ubuntu-trusty
+profile = ubuntu-lts
 
 [Centos7-package]
 profile = centos7
@@ -101,7 +101,7 @@ after_install = packaging/postinst.sh
 after_remove = packaging/postuninst.sh
 
 [Ubuntu-package]
-profile = ubuntu-trusty
+profile = ubuntu-lts
 
 [Centos7-package]
 profile = centos7
@@ -124,7 +124,7 @@ offers a **manual mode** too. That mode does not use a configuration file but
 allows you to set parameters as command arguments:
 
 ```bash
-$ vdist manual --app geolocate --version 1.3.0 --source_git https://github.com/dante-signal31/geolocate,master --profile ubuntu-trusty --compile_python --python_version 3.4.4 --fpm_args '--maintainer dante.signal31@gmail.com -a native --url https://github.com/dante-signal31/geolocate --description "This program accepts any text and searchs inside every IP address." --license BSD-3 --category net' --requirements_path /REQUIREMENTS.txt --runtime_deps libssl1.0.0 dummy1.0.0 --output_folder ./dist --after_install = packaging/postinst.sh --after_remove = packaging/postuninst.sh
+$ vdist manual --app geolocate --version 1.3.0 --source_git https://github.com/dante-signal31/geolocate,master --profile ubuntu-lts --compile_python --python_version 3.4.4 --fpm_args '--maintainer dante.signal31@gmail.com -a native --url https://github.com/dante-signal31/geolocate --description "This program accepts any text and searchs inside every IP address." --license BSD-3 --category net' --requirements_path /REQUIREMENTS.txt --runtime_deps libssl1.0.0 dummy1.0.0 --output_folder ./dist --after_install = packaging/postinst.sh --after_remove = packaging/postuninst.sh
 ```
 
 Pay attention to the point that `--fpm_args` argument is enclosed in single quotes.
@@ -168,7 +168,7 @@ builder_parameters = {
             "version": '1.0',
             "source": git(uri='https://github.com/you/yourapp',
                           branch='master'),
-            "profile": 'ubuntu-trusty',
+            "profile": 'ubuntu-lts',
         }
 
 configuration = Configuration(builder_parameters)
@@ -178,7 +178,7 @@ builder.build_package(configuration)
 
 Here is what it does: vdist will build an OS package called 'yourapp-1.0.deb'
 from a Git repo located at https://github.com/you/yourapp, from branch 'master'
-using the vdist profile 'ubuntu-trusty' (more on vdist profiles later).
+using the vdist profile 'ubuntu-lts' (more on vdist profiles later).
 While doing so, it will download and compile a Python interpreter framework and
 installs your application's dependencies
 into that framework. The whole resulting python framework will be wrapped up in a
@@ -197,7 +197,7 @@ resulting package
 OS package both in the name and in its meta information
 - `profile` :: the name of the profile to use for this specific build; its
 value should be one of two things:
-    * a vdist built-in profile (currently `centos7`, `ubuntu-trusty` and
+    * a vdist built-in profile (currently `centos7`, `ubuntu-lts` and
     `debian-wheezy` are available)
     * a custom profile that you create yourself; see
     [How to customize](http://vdistdocs.readthedocs.io/en/latest/howtocustomize/)
@@ -379,7 +379,7 @@ builder.add_build(
     app='myapp',
     source=git(uri='https://github.com/foo/myproject', branch='myrelease'),
     version='1.0',
-    profile='ubuntu-trusty'
+    profile='ubuntu-lts'
 )
 
 builder.run_build()
