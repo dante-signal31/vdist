@@ -1,11 +1,11 @@
 [DEFAULT]
 app = vdist
 # All version tags, even bintray json descriptors, are automatically updated from next value.
-version = 1.7.2
+version = 1.7.3
 ; This configurations only works for Travis builds.
 source_directory = /home/travis/build/dante-signal31/${app}
 ; If you want to build locally uncomment next line and customify for your own case.
-;source_directory = /home/dante/Projects/${app}
+; source_directory = /home/dante/Projects/${app}
 fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     https://github.com/dante-signal31/${app} --description
     "vdist (Virtualenv Distribute) is a tool that lets you build OS packages
