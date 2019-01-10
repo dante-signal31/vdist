@@ -32,10 +32,12 @@ def find_man_pages():
     man_sections = {}
     for dir in find_folders_with_this_name('man'):
         for file in os.listdir(dir):
-            section = file.split('.')[-1]
+            # I wait man files to be gzipped and their name follow this pattern:
+            # name.section.gz
+            section = file.split('.')[-2]
             man_sections[section] = man_sections.get(section, []) + [os.path.join(dir, file)]
     for section in man_sections:
-        data_files.append(('share/man/man'+section, man_sections[section]))
+        data_files.append(('share/man/man{}'.format(section), man_sections[section]))
     return data_files
 
 
