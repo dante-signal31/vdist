@@ -4,6 +4,7 @@ import subprocess
 
 import tests.test_console_launcher as test_console
 import tests.testing_tools as testing_tools
+import ci_scripts.ci_tools as ci_tools
 
 import vdist.configuration as configuration
 import vdist.builder as builder
@@ -32,6 +33,9 @@ FPM_ARGS_VDIST = '--maintainer dante.signal31@gmail.com -a native ' \
                  'virtualenv. This means that your application will ' \
                  'not depend on OS provided packages of Python modules, ' \
                  'including their versions." --license MIT --category net'
+
+VDIST_GITHUB_REPOSITORY = 'https://github.com/dante-signal31/vdist'
+VDIST_TEST_BRANCH = "vdist_tests"
 
 temporary_directory = testing_tools.get_temporary_directory_context_manager()
 
@@ -572,11 +576,10 @@ def test_generate_rpm_from_git_directory_centos7():
 
 def test_generate_deb_from_directory():
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
-        git_p = subprocess.Popen(
-            ['git', 'clone',
-             'https://github.com/dante-signal31/vdist',
-             temp_dir])
-        git_p.communicate()
+        os.chdir(temp_dir)
+        ci_tools.run_console_command("git clone {} {}".format(VDIST_GITHUB_REPOSITORY,
+                                                              temp_dir))
+        ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
 
         builder_parameters = {"app": 'vdist-test-generate-deb-from-dir',
                               "version": '1.0',
@@ -589,11 +592,10 @@ def test_generate_deb_from_directory():
 
 def _generate_rpm_from_directory(centos_version):
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
-        git_p = subprocess.Popen(
-            ['git', 'clone',
-             'https://github.com/dante-signal31/vdist',
-             temp_dir])
-        git_p.communicate()
+        os.chdir(temp_dir)
+        ci_tools.run_console_command("git clone {} {}".format(VDIST_GITHUB_REPOSITORY,
+                                                              temp_dir))
+        ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
 
         builder_parameters = {"app": 'vdist-test-generate-deb-from-dir',
                               "version": '1.0',
