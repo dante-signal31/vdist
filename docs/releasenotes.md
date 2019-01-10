@@ -1,5 +1,5 @@
 ## Release notes
-### 1.7.0 (2018/11/03)
+### 1.7.3 (2019/01/10)
 - Manpage is now available. Just type "man vdist" and you'll get usage help.
 
 ### 1.5.0 (2018/11/05)
