@@ -7,7 +7,7 @@ import ci_scripts.ci_tools as tools
 VDIST_PACKAGES_CONFIG = "packaging/vdist_build.cnf"
 
 
-def find_folders_with_this_name(dir_name: str)-> str:
+def find_folders_with_this_name(dir_name):
     """ Look for folder with given name, searching from current working dir.
 
     :param dir_name: Folder name to look for.
@@ -18,7 +18,7 @@ def find_folders_with_this_name(dir_name: str)-> str:
             yield os.path.relpath(os.path.join(dir, dir_name))
 
 
-def find_man_pages()-> List:
+def find_man_pages():
     """ Look for every folder named "man", inside current working dir, and include
     its files relatives paths in a list suitable to be passed to a data_files
     setup.py parameter. This list will set those manpages to be installed to
@@ -39,7 +39,7 @@ def find_man_pages()-> List:
     return data_files
 
 
-def find_info_pages()-> List:
+def find_info_pages():
     """ Look for every folder named "info", inside current working dir, and include
     its files relatives paths in a list suitable to be passed to a data_files
     setup.py parameter. This list will set those infopages to be installed to
