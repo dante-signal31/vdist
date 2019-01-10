@@ -14,5 +14,9 @@
     "debian-wheezy": {
         "docker_image": "dantesignal31/vdist-aux:debian:wheezy",
         "script": "debian.sh"
+    },
+    "archlinux": {
+        "docker_image": "dantesignal31/vdist-aux:archlinux",
+        "script": "archlinux.sh"
     }
 }
