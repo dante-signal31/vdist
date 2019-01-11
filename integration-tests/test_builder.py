@@ -96,6 +96,12 @@ def _get_purged_deb_file_list(deb_filepath, file_filter):
 
 
 def test_generate_deb_from_git():
+    # TODO: Every test fails except these ones:
+    # test_generate_deb_from_git_setup_compile
+    # test_generate_deb_from_git_nosetup_compile
+    # test_generate_deb_from_git_nosetup_nocompile
+    # Find out what's happening with every other test.
+    # You could start debugging this test.
     with temporary_directory() as output_dir:
         builder_parameters = {"app": 'vdist-test-generate-deb-from-git',
                               "version": '1.0',
