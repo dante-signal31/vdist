@@ -1,4 +1,10 @@
 ## Release notes
+### 1.8.0 (2019/01/11)
+- "Ubuntu-trusty" profile is now deprecated. Included an "ubuntu-lts" instead. This 
+new profile will point to current Ubuntu Long Term Support version. Be aware that this
+means that docker image used with this profile will change in the moment Ubuntu
+team upload a new version tagged as LTS.
+ 
 ### 1.6.0 (2019/01/02)
 - Debian packages now depends on official docker-ce packages and not on docker.io.
 
