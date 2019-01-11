@@ -103,7 +103,7 @@ def test_generate_deb_from_git():
                                   uri='https://github.com/dante-signal31/vdist',
                                   branch='vdist_tests'
                               ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)
@@ -173,7 +173,7 @@ def test_generate_deb_from_git_setup_compile():
                 uri='https://github.com/dante-signal31/geolocate',
                 branch='vdist_tests'
             ),
-            "profile": 'ubuntu-trusty',
+            "profile": 'ubuntu-lts',
             "compile_python": True,
             "python_version": '3.5.3',
             "fpm_args": FPM_ARGS_GEOLOCATE,
@@ -248,7 +248,7 @@ def test_generate_deb_from_git_nosetup_compile():
                                     uri='https://github.com/objectified/jtrouble',
                                     branch='master'
                               ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "package_install_root": "/opt",
                               "python_basedir": "/opt/python",
                               "compile_python": True,
@@ -318,7 +318,7 @@ def test_generate_deb_from_git_setup_nocompile():
                 uri='https://github.com/dante-signal31/geolocate',
                 branch='vdist_tests'
             ),
-            "profile": 'ubuntu-trusty',
+            "profile": 'ubuntu-lts',
             "compile_python": False,
             "python_version": '3.5.3',
             # Lets suppose custom python package is already installed and its root
@@ -421,7 +421,7 @@ def test_generate_deb_from_git_nosetup_nocompile():
                 uri='https://github.com/objectified/jtrouble',
                 branch='master'
             ),
-            "profile": 'ubuntu-trusty',
+            "profile": 'ubuntu-lts',
             "compile_python": False,
             # Here happens the same than in
             # test_generate_deb_from_git_setup_nocompile()
@@ -498,7 +498,7 @@ def test_generate_deb_from_git_suffixed():
                                 uri='https://github.com/dante-signal31/vdist.git',
                                 branch='vdist_tests'
                               ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)
@@ -538,7 +538,7 @@ def test_generate_deb_from_git_directory():
                               "version": '1.0',
                               "source": git_directory(path=temp_dir,
                                                       branch='vdist_tests'),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)
@@ -581,7 +581,7 @@ def test_generate_deb_from_directory():
         builder_parameters = {"app": 'vdist-test-generate-deb-from-dir',
                               "version": '1.0',
                               "source": directory(path=temp_dir, ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)

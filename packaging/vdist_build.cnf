@@ -19,7 +19,7 @@ after_install = packaging/postinst.sh
 after_remove = packaging/postuninst.sh
 
 [Ubuntu-package]
-profile = ubuntu-trusty
+profile = ubuntu-lts
 runtime_deps = libssl1.0.0, docker-ce
 
 [Centos7-package]
