@@ -1,4 +1,7 @@
 ## Release notes
+### 1.7.5 (2019/04/15)
+- Fixed wrong URL at manpage.
+
 ### 1.7.4 (2019/04/15)
 - Used Jinja2 version had a security alert. Dependency updated to a safe version.
 
