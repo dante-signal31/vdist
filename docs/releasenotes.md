@@ -1,4 +1,7 @@
 ## Release notes
+### 1.7.4 (2019/04/15)
+- Used Jinja2 version had a security alert. Dependency updated to a safe version.
+
 ### 1.7.3 (2019/01/10)
 - Manpage is now available. Just type "man vdist" and you'll get usage help.
 

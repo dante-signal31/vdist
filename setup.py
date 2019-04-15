@@ -77,7 +77,7 @@ setup(
     data_files=find_man_pages(),
     packages=find_packages(exclude=["tests", "integration-tests",
                                     "ci_scripts", "examples", "docs"]),
-    install_requires=['jinja2==2.7.3', 'docker==3.2.1'],
+    install_requires=['jinja2==2.10.1', 'docker==3.2.1'],
     entry_points={'console_scripts': ['vdist=vdist.vdist_launcher:main', ], },
     package_data={'': ['internal_profiles.json', '*.sh']},
     tests_require=['pytest'],
