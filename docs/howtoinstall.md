@@ -80,8 +80,6 @@ repository and install from there, type:
 ```
 $ wget https://bintray.com/dante-signal31/rpm/rpm -O bintray-dante-signal31-rpm.repo
 $ sudo mv bintray-dante-signal31-rpm.repo /etc/yum.repos.d/
-$ sudo yum install -y yum-utils
-$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 $ yum update
 $ yum install vdist
 ```
