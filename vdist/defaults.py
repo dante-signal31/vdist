@@ -1,7 +1,7 @@
 import os
 
 PYTHON_BASEDIR = '/opt'
-PYTHON_VERSION = '2.7.9'
+PYTHON_VERSION = '3.7.5'
 LOCAL_PROFILES_DIR = 'buildprofiles'
 LOCAL_PROFILES_FILE = 'profiles.json'
 VDIST_USERDIR = os.path.join(os.path.expanduser('~'), '.vdist')
