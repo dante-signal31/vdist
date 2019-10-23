@@ -15,6 +15,11 @@
         "docker_image": "dantesignal31/vdist-aux:ubuntu-lts",
         "script": "debian.sh"
     },
+    "ubuntu-lts-custom": {
+      "_comment": "Don't use this image. It's only for vdist testing.",
+      "docker_image": "dantesignal31/vdist-aux:ubuntu-lts-custom",
+      "script": "debian.sh"
+    },
     "debian-wheezy": {
         "docker_image": "dantesignal31/vdist-aux:debian:wheezy",
         "script": "debian.sh"
