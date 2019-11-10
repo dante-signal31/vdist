@@ -21,8 +21,8 @@ yum install -y {{build_deps|join(' ')}}
 # Download and compile what is going to be the Python we are going to use
 # as our portable python environment.
     # Since Python 3.7 you need libffi to compile it.
-    yum update -y
-    yum install libffi-dev -y
+    yum update --nogpgcheck -y
+    yum install libffi-devel -y
     cd /var/tmp
     curl -O https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz
     tar xzvf Python-$PYTHON_VERSION.tgz
@@ -65,7 +65,9 @@ cd {{package_tmp_root}}
 {% elif source.type in ['directory', 'git_directory'] %}
     # Place application files inside temporary folder after copying it from
     # local folder.
-    cp -r {{shared_dir}}/{{scratch_folder_name}}/{{project_root}} .
+#    mkdir -p {{project_root}}
+#    cd {{project_root}}
+    cp -ar {{shared_dir}}/{{scratch_folder_name}}/{{project_root}} .
     cd {{package_tmp_root}}/{{project_root}}
 
     {% if source.type == 'git_directory' %}
