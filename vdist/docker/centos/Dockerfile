@@ -3,7 +3,7 @@ MAINTAINER dante-signal31 (dante.signal31@gmail.com)
 # Abort on error.
 RUN set -e
 # Install build tools.
-RUN yum -y update && \
+RUN yum -y --nogpgcheck update && \
     # Install yum-utils to get config-manager for yum.
     yum install -y yum-utils && \
     # Libyaml-devel and other packages are not anymore if you don't enable PowerTools.
