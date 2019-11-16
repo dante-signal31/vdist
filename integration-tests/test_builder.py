@@ -384,7 +384,7 @@ def test_generate_deb_from_git_setup_nocompile():
                     for file_entry in file_list_purged))
         # If python basedir was properly packaged then /root/custom/bin/python should be
         # there.
-        python_interpreter = "./root/custom_python/bin/python3"
+        python_interpreter = "./root/custom_python/bin/python3.7"
         assert python_interpreter in file_list_purged
         # If application was properly packaged then launcher should be in bin folder
         # too.
@@ -433,11 +433,14 @@ def _generate_rpm_from_git_setup_nocompile(centos_version):
         geolocate_launcher = "/root/custom_python/bin/geolocate"
         assert geolocate_launcher in file_list
 
+
 # TODO: These tests fails <<<<<<<<<<<<<
 # WARNING: Something wrong happens with "nocompile" tests in centos7 and 6.
 # I don't know why fpm call corrupts some lib in the linux container so
 # further cp command fails. This does not happen in debian even
 # when fpm commands are the same. Any help with this issue will be welcome.
+# @pytest.mark.rpm
+# @pytest.mark.centos
 # def test_generate_rpm_from_git_setup_nocompile_centos():
 #     _generate_rpm_from_git_setup_nocompile("centos")
 #
@@ -462,7 +465,7 @@ def test_generate_deb_from_git_nosetup_nocompile():
             "compile_python": False,
             # Here happens the same than in
             # test_generate_deb_from_git_setup_nocompile()
-            "python_version": '3.4.4',
+            # "python_version": '3.4.4',
             "python_basedir": '/root/custom_python',
             "output_folder": output_dir,
             "output_script": True
@@ -472,13 +475,13 @@ def test_generate_deb_from_git_nosetup_nocompile():
                                                      DEB_NOCOMPILE_FILTER)
         # At this point only two folders should remain if everything is correct:
         # application folder and python basedir folder.
-        correct_folders = ["./opt/jtrouble", "./usr"]
+        correct_folders = ["./opt/jtrouble", "./usr", "./root/custom_python"]
         assert all((True if any(folder in file_entry for folder in correct_folders)
                     else False
                     for file_entry in file_list_purged))
         # If python basedir was properly packaged then /usr/bin/python should be
         # there.
-        python_interpreter = "/root/custom_python/bin/python3"
+        python_interpreter = "./root/custom_python/bin/python3.7"
         assert python_interpreter in file_list_purged
 
 
