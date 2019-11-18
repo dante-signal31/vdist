@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import datetime
 import json
 import os.path
 import sys
@@ -28,6 +29,11 @@ def remove_extension(filename):
     return name_without_extension
 
 
+def get_current_date():
+    date = datetime.datetime.now()
+    return "{}-{}-{}".format(date.year, date.month, date.day)
+
+
 def create_descriptor(name, content, version):
     tag = remove_extension(name)
     descriptor_name = BINTRAY_DESCRIPTOR_NAME_FORMAT.format(tag=tag)
@@ -35,6 +41,9 @@ def create_descriptor(name, content, version):
                                           descriptor_name)
     content["version"]["name"] = "{prefix}{version}".format(prefix=VERSION_PREFIX,
                                                             version=version)
+    content["version"]["vcs_tag"] = "{prefix}{version}".format(prefix=VERSION_PREFIX,
+                                                               version=version)
+    content["version"]["released"] = get_current_date()
     with open(descriptor_folder_path, "w") as descriptor:
         json.dump(content, descriptor)
         print("Created descriptor: {name}".format(name=descriptor_folder_path))

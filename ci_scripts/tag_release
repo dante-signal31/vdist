@@ -24,18 +24,27 @@ def set_version_tag(prefix):
     version = tools.get_current_version(VDIST_CONFIGURATION)
     version_string = "{0}{1}".format(prefix, version)
     tools.run_console_command("git tag '{0}'".format(version_string))
-    # tools.run_console_command("git push origin '{0}'".format(version_string))
     print("Tag set.")
     return version_string
 
-# To make just one push, now tagging is called from merge_with_production_script.
-#
-# if __name__ == '__main__':
-#     try:
-#         set_contact_data(GIT_USERNAME, GIT_EMAIL)
-#         set_version_tag(VERSION_PREFIX)
-#     except:
-#         traceback.print_exc(file=sys.stdout)
-#         sys.exit(1)
-#     else:
-#         sys.exit(0)
+
+def push_tag(version, github_repo=GITHUB_REPO, github_token=GITHUB_TOKEN):
+    print("Pushing tag...")
+    push_uri = "https://{token}@github.com/{repo}".format(token=github_token,
+                                                          repo=github_repo)
+    # Redirect to /dev/null to avoid secret leakage
+    tools.run_console_command("git push {uri} {version} > /dev/null 2>&1".format(uri=push_uri,
+                                                                                 version=version))
+    print("Pushed.")
+
+
+if __name__ == '__main__':
+    try:
+        set_contact_data(GIT_USERNAME, GIT_EMAIL)
+        version_string = set_version_tag(VERSION_PREFIX)
+        push_tag(version=version_string)
+    except:
+        traceback.print_exc(file=sys.stdout)
+        sys.exit(1)
+    else:
+        sys.exit(0)

@@ -60,7 +60,7 @@ notifications:
 ################################
 before_install:
   - sudo apt-get update -qq
-  # To test we need docker.io but that comes already packaged in travis image
+  # To test we need docker but that comes already packaged in travis image
   # so we don't need to install it.
   - sudo apt-get install -qq libssl1.0.0 rpm
 install:
@@ -80,6 +80,8 @@ jobs:
   # Update master branch.
   - stage: Branch merge to production branch
     python: 3.6
+    env:
+    - PYTHONPATH="${PYTHONPATH}:${TRAVIS_BUILD_DIR}"
     if: branch = staging
     script:
     - ci_scripts/merge_with_production
@@ -101,9 +103,11 @@ jobs:
     python: 3.6
     if: branch = staging
     script:
-    - travis_wait 20 ci_scripts/build_system_packages
-#    - ci_scripts/tag_release.py
-    - ci_scripts/create_bintray_descriptors_from_templates
+      - gzip man/vdist.1
+      - ci_scripts/create_postinst_script
+      - travis_wait 20 ci_scripts/build_system_packages
+      - ci_scripts/create_bintray_descriptors_from_templates
+      - ci_scripts/tag_release
     deploy:
     # Github Releases.
     - provider: releases

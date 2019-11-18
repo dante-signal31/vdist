@@ -1,9 +1,24 @@
 ## Release notes
+
 ### 1.8.0 (2019/01/11)
 - "Ubuntu-trusty" profile is now deprecated. Included an "ubuntu-lts" instead. This 
 new profile will point to current Ubuntu Long Term Support version. Be aware that this
 means that docker image used with this profile will change in the moment Ubuntu
 team upload a new version tagged as LTS.
+
+### 1.7.5 (2019/04/15)
+- Fixed wrong URL at manpage.
+
+### 1.7.4 (2019/04/15)
+- Used Jinja2 version had a security alert. Dependency updated to a safe version.
+
+### 1.7.3 (2019/01/10)
+- Manpage is now available. Just type "man vdist" and you'll get usage help.
+
+### 1.6.1 (2019/01/03)
+- Libffi installation moved to docker images. As they are now preinstalled they
+are not needed to be downloaded and installed at building time so this one is 
+faster.
  
 ### 1.6.0 (2019/01/02)
 - Debian packages now depends on official docker-ce packages and not on docker.io.
