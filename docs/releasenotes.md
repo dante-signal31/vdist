@@ -1,4 +1,33 @@
 ## Release notes
+
+### 2.0.0 (2019/01/11)
+- "ubuntu-trusty" profile is now deprecated. Included an "ubuntu-lts" instead. This 
+new profile will point to current Ubuntu Long Term Support version. Be aware that this
+means that docker image used with this profile will change in the moment Ubuntu
+team upload a new version tagged as LTS.
+- Added a new profile "centos" that point to latest centos version. Be aware
+that that docker image will change as happens with the one related to "ubunu-lts".
+- "centos7" profile marked as deprecated. It will be removed soon.
+- "centos6" profile is broken. I've not been able to make it work again so I've
+removed it from available profiles. I'm going to keep centos6 related code for a 
+time just in case anyone find a way to fix it. As time passes that code will be 
+entirely removed.
+
+
+### 1.7.5 (2019/04/15)
+- Fixed wrong URL at manpage.
+
+### 1.7.4 (2019/04/15)
+- Used Jinja2 version had a security alert. Dependency updated to a safe version.
+
+### 1.7.3 (2019/01/10)
+- Manpage is now available. Just type "man vdist" and you'll get usage help.
+
+### 1.6.1 (2019/01/03)
+- Libffi installation moved to docker images. As they are now preinstalled they
+are not needed to be downloaded and installed at building time so this one is 
+faster.
+ 
 ### 1.6.0 (2019/01/02)
 - Debian packages now depends on official docker-ce packages and not on docker.io.
 

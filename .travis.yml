@@ -15,26 +15,25 @@ services:
 # TEST MATRIX
 ################################
 python:
-- 3.6
-- 3.7.1
+- 3.7.5
 - nightly
 env:
  global:
  - secure: "Ig3i1GxGTxz+J1LR46cmkkWzpHBUsUVpTVJZ5nyrH6781eoQmZStNfBdmn32MogumbyTnQzUEtWHEdAMErwtmOcCOo0LkrHKYNlJopVA06NwO7+IO8FGpSEydeMYFMsWdEO8Hg2vk/xr+K7UjVcJvG0usPxpEpIE17abif64mnDJXuB3VHchi/0I1BYimnmXVVFh93A+xOdXxbYjnPCDSQQ+f85NqTyMw1aTCkYuqG1XOZBdrO0rGd8McHjdbwLFOmN0Ve6SaollosztA/AgI5VcfsCn4tlSpg6DmY976QWkWchVVQI33vJEYGXiA4VFLzfGJsobQQZHuAieLBsvgj3Lz8OVVItnIPYVOcJ1qDbQP09VZKxFo9zDajJq1169oYSFlOj/0KrHJYEIGHwk+kwBWn6THdnadY8qeko1TEdWfrsgn3gmCUK9njQCA5UJM+7dPTWTE++fSBc0dZqXLV8ooPJ7ZjCMX7BCG0PR9Sr2PRLwOFtGYpWzdu4hIM8r8TBLZfo85LcGwa+mhOtfD+bdxCoYyvsmQzgGpcVWqJc76WuvemHSjmpV08mKu3UHyRPrmUP2yrD700u05kj9G6mpu0ZGzQgq567YaUy/jaQp2esNNhZ4PNdDvKtatUDY7OQ9RXguNKSYNI+b+7IgDdK3vQ4uCBMjDP4F1VEulJ0="
  matrix:
   - TEST_TAG="test_generate_deb"
-  - TEST_TAG="test_generate_rpm_from_directory_centos7"
-  - TEST_TAG="test_generate_rpm_from_git_centos7"
-  - TEST_TAG="test_generate_rpm_from_git_directory_centos7"
-  - TEST_TAG="test_generate_rpm_from_git_nosetup_compile_centos7"
-  - TEST_TAG="test_generate_rpm_from_git_setup_compile_centos7"
-  - TEST_TAG="test_generate_rpm_from_git_suffixed_centos7"
+  - TEST_TAG="test_generate_rpm_from_directory_centos"
+  - TEST_TAG="test_generate_rpm_from_git_centos"
+  - TEST_TAG="test_generate_rpm_from_git_directory_centos"
+  - TEST_TAG="test_generate_rpm_from_git_nosetup_compile_centos"
+  - TEST_TAG="test_generate_rpm_from_git_setup_compile_centos"
+  - TEST_TAG="test_generate_rpm_from_git_suffixed_centos"
 matrix:
   allow_failures:
   # Actually I only build with latest stable python release, but I want
   # to be aware in advance if any dev python version is going to crash
   # my future builds.
-  - python: 3.7.1 nightly
+  - python: nightly
 
 
 ################################
@@ -60,13 +59,13 @@ notifications:
 ################################
 before_install:
   - sudo apt-get update -qq
-  # To test we need docker.io but that comes already packaged in travis image
+  # To test we need docker but that comes already packaged in travis image
   # so we don't need to install it.
   - sudo apt-get install -qq libssl1.0.0 rpm
 install:
   - pip install -r requirements.txt
 script:
-  # Seems that centos7 tests fail if I don't give them additional time.
+  # Seems that centos tests fail if I don't give them additional time.
   - travis_wait 50 pytest -v -rs -k $TEST_TAG
 
 
@@ -79,13 +78,15 @@ jobs:
   include:
   # Update master branch.
   - stage: Branch merge to production branch
-    python: 3.6
+    python: 3.7
+    env:
+    - PYTHONPATH="${PYTHONPATH}:${TRAVIS_BUILD_DIR}"
     if: branch = staging
     script:
     - ci_scripts/merge_with_production
   # Upload packages to Python Package Index.
   - stage: Pypi deployment
-    python: 3.6
+    python: 3.7
     script: echo "Deploying to Python Package Index..."
     deploy:
     - provider: pypi
@@ -98,12 +99,14 @@ jobs:
         branch: staging
   # Build DEB and RPM packages and upload them to Github and Bintray.
   - stage: System packages deployment
-    python: 3.6
+    python: 3.7
     if: branch = staging
     script:
-    - travis_wait 20 ci_scripts/build_system_packages
-#    - ci_scripts/tag_release.py
-    - ci_scripts/create_bintray_descriptors_from_templates
+      - gzip man/vdist.1
+      - ci_scripts/create_postinst_script
+      - travis_wait 20 ci_scripts/build_system_packages
+      - ci_scripts/create_bintray_descriptors_from_templates
+      - ci_scripts/tag_release
     deploy:
     # Github Releases.
     - provider: releases

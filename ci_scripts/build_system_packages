@@ -8,66 +8,9 @@ if sys.version_info.major < 3:
 else:
     from ci_scripts import ci_tools as tools
 
-# APT_SOURCES_FILEPATH = "/etc/apt/sources.list"
-# BINTRAY_VDIST_CONFIG_STRING = "deb [trusted=yes] " \
-#                               "https://dl.bintray.com/dante-signal31/deb " \
-#                               "generic main\n"
-#
-#
-# def get_current_interpreter_version():
-#     version_string = "{0}.{1}".format(sys.version_info.major,
-#                                       sys.version_info.minor)
-#     return version_string
-#
-#
-# def get_current_tag():
-#     current_tag = os.getenv("TEST_TAG")
-#     return current_tag
-#
-#
-# def install_dependencies():
-#     print("Installing dependencies for Bintray...")
-#     tools.run_console_command("sudo apt-get update")
-#     tools.run_console_command("sudo apt-get install apt-transport-https")
-#     print("Dependencies for Bintray installed.")
-#     print("Installing docker...")
-#     tools.run_console_command("sudo apt-get install docker.io")
-#     print("Docker installed")
-#
-#
-# def install_bintray_key():
-#     print("Adding Bintray pgp key...")
-#     tools.run_console_command("sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 379CE192D401AB61")
-#     print("Bintray pgp key added.")
-#
-#
-# def check_bintray_in_apt_sources():
-#     if _included_in_apt_sources(BINTRAY_VDIST_CONFIG_STRING):
-#         print("Bintray already in apt sources list.")
-#     else:
-#         print("Bintray not in apt sources list. Including it...")
-#         _include_apt_source(BINTRAY_VDIST_CONFIG_STRING)
-#         print("Bintray is now included in apt sources list.")
-#
-#
-# def _included_in_apt_sources(source_url,
-#                              apt_filepath=APT_SOURCES_FILEPATH):
-#     with open(apt_filepath, mode="r") as apt_file:
-#         return True if source_url in apt_file else False
-#
-#
-# def _include_apt_source(source_url,
-#                         apt_filepath=APT_SOURCES_FILEPATH):
-#     with open(apt_filepath, mode="a") as apt_file:
-#         bintray_source_entry = "\n\n{0}".format(source_url)
-#         apt_file.write(bintray_source_entry)
-
 
 def install_vdist():
-    # print("Installing vdist package from Bintray...")
     print("Installing vdist package from Pypi...")
-    # tools.run_console_command("sudo apt-get update")
-    # tools.run_console_command("sudo apt-get install vdist")
     tools.run_console_command("pip install vdist")
     print("vdist installed.")
 
@@ -82,19 +25,6 @@ def build_packages():
 if __name__ == '__main__':
     try:
         print("This job is going to build vdist system packages.")
-        # I'd like to install vdist from an apt repository because I feel
-        # a deb package let me do a more proper dependency management. Problem
-        # is that, to ease installation, I've set docker.io as dependency
-        # instead of docker-ce (harder to install) so Travis default
-        # docker-ce is overwritten by Travis Trusty's docker.io version which
-        # is rather old and incompatible with client module used by vdist.
-        # This does not happen in local tests because I use a newer Ubuntu
-        # that install a newer docker.io package too. So I've going to install
-        # vdist from Pypi until Travis updates its available Ubuntu versions.
-        # Good news are that vdist installation will be considerably quicker.
-        # install_dependencies()
-        # install_bintray_key()
-        # check_bintray_in_apt_sources()
         install_vdist()
         build_packages()
     except:

@@ -1,15 +1,34 @@
 {
+    "centos": {
+        "docker_image": "dantesignal31/vdist-aux:centos",
+        "script": "centos.sh"
+    },
+    "centos-custom": {
+      "_comment": "Don't use this image. It's only for vdist testing.",
+      "docker_image": "dantesignal31/vdist-aux:centos-custom",
+      "script": "centos.sh"
+    },
     "centos7": {
         "docker_image": "dantesignal31/vdist-aux:centos7",
         "script": "centos.sh"
     },
-    "centos6": {
-        "docker_image": "dantesignal31/vdist-aux:centos6",
-        "script": "centos6.sh"
+    "centos7-custom": {
+      "_comment": "Don't use this image. It's only for vdist testing.",
+      "docker_image": "dantesignal31/vdist-aux:centos7-custom",
+      "script": "debian.sh"
     },
     "ubuntu-trusty": {
         "docker_image": "dantesignal31/vdist-aux:ubuntu-trusty",
         "script": "debian.sh"
+    },
+    "ubuntu-lts": {
+        "docker_image": "dantesignal31/vdist-aux:ubuntu-lts",
+        "script": "debian.sh"
+    },
+    "ubuntu-lts-custom": {
+      "_comment": "Don't use this image. It's only for vdist testing.",
+      "docker_image": "dantesignal31/vdist-aux:ubuntu-lts-custom",
+      "script": "debian.sh"
     },
     "debian-wheezy": {
         "docker_image": "dantesignal31/vdist-aux:debian:wheezy",

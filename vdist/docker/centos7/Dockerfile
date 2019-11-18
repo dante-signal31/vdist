@@ -1,9 +1,10 @@
 FROM centos:centos7
-MAINTAINER dante-signal31 (dante.signal31@gmail.com)
+LABEL maintainer="dante-signal31 (dante.signal31@gmail.com)"
+LABEL description="Image to be used by vdist to package python applications into centos rpm packages."
 # Abort on error.
 RUN set -e
 # Install build tools.
-RUN yum -y update && \
+RUN yum -y --nogpgcheck update && \
     yum groupinstall -y "Development Tools" && \
     yum install -y ruby-devel curl libyaml-devel which tar rpm-build rubygems git python-setuptools zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel epel-release libffi-devel
 # Python 3 RPM installation to get basic support in that Python version.

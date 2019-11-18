@@ -2,15 +2,23 @@ import os
 import re
 import subprocess
 
+import pytest
+
 import tests.test_console_launcher as test_console
 import tests.testing_tools as testing_tools
+import ci_scripts.ci_tools as ci_tools
 
 import vdist.configuration as configuration
 import vdist.builder as builder
 from vdist.source import git, git_directory, directory
 
 DEB_COMPILE_FILTER = [r'[^\.]', r'\./$', r'\./usr/', r'\./opt/$']
-DEB_NOCOMPILE_FILTER = [r'[^\.]', r'^\.\.', r'\./$', r'^\.$', r'\./opt/$']
+DEB_NOCOMPILE_FILTER = [r'[^\.]', r'^\.\.', r'\./$', r'^\.$', r'\./opt/$',
+                        r'\./root/$',
+                        r'\./usr/$', r'\./usr/share/$', r'\./usr/share/doc/$',
+                        r'\./usr/share/doc/geolocate/$',
+                        r'\./usr/share/doc/geolocate/changelog.gz$']
+RPM_COMPILE_FILTER = [r'\/usr/lib/.build-id']
 
 FPM_ARGS_GEOLOCATE = '--maintainer dante.signal31@gmail.com -a native --url ' \
            'https://github.com/dante-signal31/geolocate --description ' \
@@ -32,6 +40,9 @@ FPM_ARGS_VDIST = '--maintainer dante.signal31@gmail.com -a native ' \
                  'virtualenv. This means that your application will ' \
                  'not depend on OS provided packages of Python modules, ' \
                  'including their versions." --license MIT --category net'
+
+VDIST_GITHUB_REPOSITORY = 'https://github.com/dante-signal31/vdist'
+VDIST_TEST_BRANCH = "vdist_tests"
 
 temporary_directory = testing_tools.get_temporary_directory_context_manager()
 
@@ -95,7 +106,20 @@ def _get_purged_deb_file_list(deb_filepath, file_filter):
     return file_list_purged
 
 
+def _get_purged_rpm_file_list(rpm_filepath, file_filter):
+    file_list = _read_rpm_contents(rpm_filepath)
+    file_list_purged = _purge_list(file_list, file_filter)
+    return file_list_purged
+
+
+@pytest.mark.deb
 def test_generate_deb_from_git():
+    # TODO: Every test fails except these ones:
+    # test_generate_deb_from_git_setup_compile
+    # test_generate_deb_from_git_nosetup_compile
+    # test_generate_deb_from_git_nosetup_nocompile
+    # Find out what's happening with every other test.
+    # You could start debugging this test.
     with temporary_directory() as output_dir:
         builder_parameters = {"app": 'vdist-test-generate-deb-from-git',
                               "version": '1.0',
@@ -103,7 +127,7 @@ def test_generate_deb_from_git():
                                   uri='https://github.com/dante-signal31/vdist',
                                   branch='vdist_tests'
                               ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)
@@ -123,10 +147,14 @@ def _generate_rpm_from_git(centos_version):
         _ = _generate_rpm(builder_parameters)
 
 
-def test_generate_rpm_from_git_centos6():
-    _generate_rpm_from_git("centos6")
+@pytest.mark.rpm
+@pytest.mark.centos
+def test_generate_rpm_from_git_centos():
+    _generate_rpm_from_git("centos")
 
 
+@pytest.mark.rpm
+@pytest.mark.centos7
 def test_generate_rpm_from_git_centos7():
     _generate_rpm_from_git("centos7")
 
@@ -164,6 +192,7 @@ def _get_copied_script_path(_configuration):
 
 # Scenario 1 - Project containing a setup.py and compiles Python -> only package
 # the whole Python basedir.
+@pytest.mark.deb
 def test_generate_deb_from_git_setup_compile():
     with temporary_directory() as output_dir:
         builder_parameters = {
@@ -173,7 +202,7 @@ def test_generate_deb_from_git_setup_compile():
                 uri='https://github.com/dante-signal31/geolocate',
                 branch='vdist_tests'
             ),
-            "profile": 'ubuntu-trusty',
+            "profile": 'ubuntu-lts',
             "compile_python": True,
             "python_version": '3.5.3',
             "fpm_args": FPM_ARGS_GEOLOCATE,
@@ -220,26 +249,32 @@ def _generate_rpm_from_git_setup_compile(centos_version):
             "output_script": True
         }
         target_file = _generate_rpm(builder_parameters)
-        file_list = _read_rpm_contents(target_file)
+        file_list_purged = _get_purged_rpm_file_list(target_file,
+                                                     RPM_COMPILE_FILTER)
         # At this point only a folder should remain if everything is correct.
         correct_install_path = "/opt/vdist"
         assert all((True if correct_install_path in file_entry else False
-                    for file_entry in file_list))
+                    for file_entry in file_list_purged))
         # vdist launcher should be in bin folder too.
         vdist_launcher = "/opt/vdist/bin/vdist"
-        assert vdist_launcher in file_list
+        assert vdist_launcher in file_list_purged
 
 
-def test_generate_rpm_from_git_setup_compile_centos6():
-    _generate_rpm_from_git_setup_compile("centos6")
+@pytest.mark.rpm
+@pytest.mark.centos
+def test_generate_rpm_from_git_setup_compile_centos():
+    _generate_rpm_from_git_setup_compile("centos")
 
 
+@pytest.mark.rpm
+@pytest.mark.centos7
 def test_generate_rpm_from_git_setup_compile_centos7():
     _generate_rpm_from_git_setup_compile("centos7")
 
 
 # Scenario 2.- Project not containing a setup.py and compiles Python -> package
 # both the project dir and the Python basedir
+@pytest.mark.deb
 def test_generate_deb_from_git_nosetup_compile():
     with temporary_directory() as output_dir:
         builder_parameters = {"app": 'jtrouble',
@@ -248,7 +283,7 @@ def test_generate_deb_from_git_nosetup_compile():
                                     uri='https://github.com/objectified/jtrouble',
                                     branch='master'
                               ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "package_install_root": "/opt",
                               "python_basedir": "/opt/python",
                               "compile_python": True,
@@ -286,29 +321,34 @@ def _generate_rpm_from_git_nosetup_compile(centos_version):
                               "output_folder": output_dir,
                               "output_script": True}
         target_file = _generate_rpm(builder_parameters)
-        file_list = _read_rpm_contents(target_file)
+        purged_file_list = _get_purged_rpm_file_list(target_file,
+                                                     RPM_COMPILE_FILTER)
         # At this point only two folders should remain if everything is correct:
         # application folder and compiled interpreter folder.
         correct_folders = ["/opt/jtrouble", "/opt/python"]
         assert all((True if any(folder in file_entry for folder in correct_folders)
                     else False
-                    for file_entry in file_list))
+                    for file_entry in purged_file_list))
         assert any(correct_folders[0] in file_entry
-                   for file_entry in file_list)
+                   for file_entry in purged_file_list)
         assert any(correct_folders[1] in file_entry
-                   for file_entry in file_list)
+                   for file_entry in purged_file_list)
 
 
-def test_generate_rpm_from_git_nosetup_compile_centos6():
-    _generate_rpm_from_git_nosetup_compile("centos6")
+@pytest.mark.rpm
+@pytest.mark.centos
+def test_generate_rpm_from_git_nosetup_compile_centos():
+    _generate_rpm_from_git_nosetup_compile("centos")
 
-
+@pytest.mark.rpm
+@pytest.mark.centos7
 def test_generate_rpm_from_git_nosetup_compile_centos7():
     _generate_rpm_from_git_nosetup_compile("centos7")
 
 
 # Scenario 3 - Project containing a setup.py and using a prebuilt Python package
 # (e.g. not compiling) -> package the custom Python basedir only.
+@pytest.mark.deb
 def test_generate_deb_from_git_setup_nocompile():
     with temporary_directory() as output_dir:
         builder_parameters = {
@@ -318,14 +358,12 @@ def test_generate_deb_from_git_setup_nocompile():
                 uri='https://github.com/dante-signal31/geolocate',
                 branch='vdist_tests'
             ),
-            "profile": 'ubuntu-trusty',
+            "profile": 'ubuntu-lts-custom',
             "compile_python": False,
-            "python_version": '3.5.3',
+            # "python_version": '3.5.3',
             # Lets suppose custom python package is already installed and its root
-            # folder is /usr. Actually I'm using default installed python3
-            # package, it's is going to be a huge package but this way don't
-            # need a private package repository.
-            "python_basedir": '/usr',
+            # folder is /root/custom_python.
+            "python_basedir": '/root/custom_python',
             "fpm_args": FPM_ARGS_GEOLOCATE,
             "requirements_path": '/REQUIREMENTS.txt',
             "build_deps": ["python3-all-dev", "build-essential", "libssl-dev",
@@ -341,16 +379,20 @@ def test_generate_deb_from_git_setup_nocompile():
         file_list_purged = _get_purged_deb_file_list(target_file,
                                                      DEB_NOCOMPILE_FILTER)
         # At this point only a folder should remain if everything is correct.
-        correct_install_path = "./usr"
+        correct_install_path = "./root/custom_python"
+        odd_entries = []
+        for file_entry in file_list_purged:
+            if not "./root/custom_python" in file_entry:
+                odd_entries.append(file_entry)
         assert all((True if correct_install_path in file_entry else False
                     for file_entry in file_list_purged))
-        # If python basedir was properly packaged then /usr/bin/python should be
+        # If python basedir was properly packaged then /root/custom/bin/python should be
         # there.
-        python_interpreter = "./usr/bin/python2.7"
+        python_interpreter = "./root/custom_python/bin/python3.7"
         assert python_interpreter in file_list_purged
         # If application was properly packaged then launcher should be in bin folder
         # too.
-        geolocate_launcher = "./usr/local/bin/geolocate"
+        geolocate_launcher = "./root/custom_python/bin/geolocate"
         assert geolocate_launcher in file_list_purged
 
 
@@ -365,12 +407,10 @@ def _generate_rpm_from_git_setup_nocompile(centos_version):
             ),
             "profile": centos_version,
             "compile_python": False,
-            "python_version": '3.4.4',
+            # "python_version": '3.4.4',
             # Lets suppose custom python package is already installed and its root
-            # folder is /usr. Actually I'm using default installed python3
-            # package, it's is going to be a huge package but this way don't
-            # need a private package repository.
-            "python_basedir": '/usr',
+            # folder is '/root/custom_python'.
+            "python_basedir": '/root/custom_python',
             "fpm_args": FPM_ARGS_GEOLOCATE,
             "requirements_path": '/REQUIREMENTS.txt',
             "build_deps": ["python3-all-dev", "build-essential", "libssl-dev",
@@ -390,20 +430,23 @@ def _generate_rpm_from_git_setup_nocompile(centos_version):
                     for file_entry in file_list))
         # If python basedir was properly packaged then /usr/bin/python should be
         # there.
-        python_interpreter = "/usr/bin/python"
+        python_interpreter = "/root/custom_python/bin/python3"
         assert python_interpreter in file_list
         # If application was properly packaged then launcher should be in bin folder
         # too.
-        geolocate_launcher = "/usr/bin/geolocate"
+        geolocate_launcher = "/root/custom_python/bin/geolocate"
         assert geolocate_launcher in file_list
+
 
 # TODO: These tests fails <<<<<<<<<<<<<
 # WARNING: Something wrong happens with "nocompile" tests in centos7 and 6.
 # I don't know why fpm call corrupts some lib in the linux container so
 # further cp command fails. This does not happen in debian even
 # when fpm commands are the same. Any help with this issue will be welcome.
-# def test_generate_rpm_from_git_setup_nocompile_centos6():
-#     _generate_rpm_from_git_setup_nocompile("centos6")
+# @pytest.mark.rpm
+# @pytest.mark.centos
+# def test_generate_rpm_from_git_setup_nocompile_centos():
+#     _generate_rpm_from_git_setup_nocompile("centos")
 #
 #
 # def test_generate_rpm_from_git_setup_nocompile_centos7():
@@ -412,6 +455,7 @@ def _generate_rpm_from_git_setup_nocompile(centos_version):
 
 # Scenario 4.- Project not containing a setup.py and using a prebuilt Python
 # package -> package both the project dir and the Python basedir
+@pytest.mark.deb
 def test_generate_deb_from_git_nosetup_nocompile():
     with temporary_directory() as output_dir:
         builder_parameters = {
@@ -421,12 +465,12 @@ def test_generate_deb_from_git_nosetup_nocompile():
                 uri='https://github.com/objectified/jtrouble',
                 branch='master'
             ),
-            "profile": 'ubuntu-trusty',
+            "profile": 'ubuntu-lts-custom',
             "compile_python": False,
             # Here happens the same than in
             # test_generate_deb_from_git_setup_nocompile()
-            "python_version": '3.4.4',
-            "python_basedir": '/usr',
+            # "python_version": '3.4.4',
+            "python_basedir": '/root/custom_python',
             "output_folder": output_dir,
             "output_script": True
         }
@@ -435,13 +479,13 @@ def test_generate_deb_from_git_nosetup_nocompile():
                                                      DEB_NOCOMPILE_FILTER)
         # At this point only two folders should remain if everything is correct:
         # application folder and python basedir folder.
-        correct_folders = ["./opt/jtrouble", "./usr"]
+        correct_folders = ["./opt/jtrouble", "./usr", "./root/custom_python"]
         assert all((True if any(folder in file_entry for folder in correct_folders)
                     else False
                     for file_entry in file_list_purged))
         # If python basedir was properly packaged then /usr/bin/python should be
         # there.
-        python_interpreter = "./usr/bin/python2.7"
+        python_interpreter = "./root/custom_python/bin/python3.7"
         assert python_interpreter in file_list_purged
 
 
@@ -458,38 +502,40 @@ def _generate_rpm_from_git_nosetup_nocompile(centos_version):
             "compile_python": False,
             # Here happens the same than in
             # test_generate_deb_from_git_setup_nocompile()
-            "python_version": '3.4.4',
-            "python_basedir": '/usr',
+            # "python_version": '3.4.4',
+            "python_basedir": '/root/custom_python',
             "output_folder": output_dir,
             "output_script": True
         }
         target_file = _generate_rpm(builder_parameters)
-        file_list = _read_rpm_contents(target_file)
+        purged_file_list = _get_purged_rpm_file_list(target_file,
+                                                     RPM_COMPILE_FILTER)
         # At this point only two folders should remain if everything is correct:
         # application folder and python basedir folder.
-        correct_folders = ["/opt/jtrouble", "/usr"]
+        correct_folders = ["/opt/jtrouble", "/root/custom_python"]
         assert all((True if any(folder in file_entry for folder in correct_folders)
                     else False
-                    for file_entry in file_list))
+                    for file_entry in purged_file_list))
         # If python basedir was properly packaged then /usr/bin/python should be
         # there.
-        python_interpreter = "/usr/bin/python"
-        assert python_interpreter in file_list
+        python_interpreter = "/root/custom_python/bin/python3"
+        assert python_interpreter in purged_file_list
 
-
-def test_generate_rpm_from_git_nosetup_nocompile_centos6():
-    _generate_rpm_from_git_nosetup_nocompile("centos6")
+@pytest.mark.rpm
+@pytest.mark.centos
+def test_generate_rpm_from_git_nosetup_nocompile_centos():
+    _generate_rpm_from_git_nosetup_nocompile("centos-custom")
 
 
 # TODO: This test fails <<<<<<<<<<<<<
 # WARNING: Something wrong happens with "nocompile" tests in centos7.
 # I don't know why fpm call corrupts some lib in the linux container so
-# further cp command fails. This does not happen in centos6 or debian even
+# further cp command fails. This does not happen in centos or debian even
 # when fpm commands are the same. Any help with this issue will be welcome.
 # def test_generate_rpm_from_git_nosetup_nocompile_centos7():
-#     _generate_rpm_from_git_nosetup_nocompile("centos7")
+#     _generate_rpm_from_git_nosetup_nocompile("centos7-custom")
 
-
+@pytest.mark.deb
 def test_generate_deb_from_git_suffixed():
     with temporary_directory() as output_dir:
         builder_parameters = {"app": 'vdist-test-generate-deb-from-git-suffixed',
@@ -498,7 +544,7 @@ def test_generate_deb_from_git_suffixed():
                                 uri='https://github.com/dante-signal31/vdist.git',
                                 branch='vdist_tests'
                               ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)
@@ -518,14 +564,18 @@ def _generate_rpm_from_git_suffixed(centos_version):
         _ = _generate_rpm(builder_parameters)
 
 
-def test_generate_rpm_from_git_suffixed_centos6():
-    _generate_rpm_from_git_suffixed("centos6")
+@pytest.mark.rpm
+@pytest.mark.centos
+def test_generate_rpm_from_git_suffixed_centos():
+    _generate_rpm_from_git_suffixed("centos")
 
-
+@pytest.mark.rpm
+@pytest.mark.centos7
 def test_generate_rpm_from_git_suffixed_centos7():
     _generate_rpm_from_git_suffixed("centos7")
 
 
+@pytest.mark.deb
 def test_generate_deb_from_git_directory():
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
         git_p = subprocess.Popen(
@@ -538,7 +588,7 @@ def test_generate_deb_from_git_directory():
                               "version": '1.0',
                               "source": git_directory(path=temp_dir,
                                                       branch='vdist_tests'),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)
@@ -562,26 +612,30 @@ def _generate_rpm_from_git_directory(centos_version):
         _ = _generate_rpm(builder_parameters)
 
 
-def test_generate_rpm_from_git_directory_centos6():
-    _generate_rpm_from_git_directory("centos6")
+@pytest.mark.rpm
+@pytest.mark.centos
+def test_generate_rpm_from_git_directory_centos():
+    _generate_rpm_from_git_directory("centos")
 
 
+@pytest.mark.rpm
+@pytest.mark.centos7
 def test_generate_rpm_from_git_directory_centos7():
     _generate_rpm_from_git_directory("centos7")
 
 
+@pytest.mark.deb
 def test_generate_deb_from_directory():
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
-        git_p = subprocess.Popen(
-            ['git', 'clone',
-             'https://github.com/dante-signal31/vdist',
-             temp_dir])
-        git_p.communicate()
+        os.chdir(temp_dir)
+        ci_tools.run_console_command("git clone {} {}".format(VDIST_GITHUB_REPOSITORY,
+                                                              temp_dir))
+        ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
 
         builder_parameters = {"app": 'vdist-test-generate-deb-from-dir',
                               "version": '1.0',
                               "source": directory(path=temp_dir, ),
-                              "profile": 'ubuntu-trusty',
+                              "profile": 'ubuntu-lts',
                               "output_folder": output_dir,
                               "output_script": True}
         _ = _generate_deb(builder_parameters)
@@ -589,11 +643,10 @@ def test_generate_deb_from_directory():
 
 def _generate_rpm_from_directory(centos_version):
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
-        git_p = subprocess.Popen(
-            ['git', 'clone',
-             'https://github.com/dante-signal31/vdist',
-             temp_dir])
-        git_p.communicate()
+        os.chdir(temp_dir)
+        ci_tools.run_console_command("git clone {} {}".format(VDIST_GITHUB_REPOSITORY,
+                                                              temp_dir))
+        ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
 
         builder_parameters = {"app": 'vdist-test-generate-deb-from-dir',
                               "version": '1.0',
@@ -603,11 +656,13 @@ def _generate_rpm_from_directory(centos_version):
                               "output_script": True}
         _ = _generate_rpm(builder_parameters)
 
+@pytest.mark.rpm
+@pytest.mark.centos
+def test_generate_rpm_from_directory_centos():
+    _generate_rpm_from_directory("centos")
 
-def test_generate_rpm_from_directory_centos6():
-    _generate_rpm_from_directory("centos6")
-
-
+@pytest.mark.rpm
+@pytest.mark.centos7
 def test_generate_rpm_from_directory_centos7():
     _generate_rpm_from_directory("centos7")
 

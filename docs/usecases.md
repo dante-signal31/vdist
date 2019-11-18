@@ -61,7 +61,7 @@ builder_parameters = {
                   uri='https://github.com/dante-signal31/geolocate',
                   branch='master'
                   ),
-        "profile": 'ubuntu-trusty',
+        "profile": 'ubuntu-lts',
         "compile_python": True,
         "python_version": '3.4.3',
         "fpm_args": '--maintainer dante.signal31@gmail.com -a native --url '
@@ -105,7 +105,7 @@ builder_parameters = {"app": 'jtrouble',
                                 uri='https://github.com/objectified/jtrouble',
                                 branch='master'
                                 ),
-                      "profile": 'ubuntu-trusty',
+                      "profile": 'ubuntu-lts',
                       "package_install_root": "/opt",
                       "python_basedir": "/opt/python",
                       "compile_python": True,
@@ -138,7 +138,7 @@ builder_parameters = {
             uri='https://github.com/dante-signal31/geolocate',
             branch='master'
         ),
-        "profile": 'ubuntu-trusty',
+        "profile": 'ubuntu-lts',
         "compile_python": False,
         "python_version": '3.4.3',
         # Lets suppose custom python package is already installed and its root
@@ -172,7 +172,7 @@ builder_parameters = {
             uri='https://github.com/objectified/jtrouble',
             branch='master'
         ),
-        "profile": 'ubuntu-trusty',
+        "profile": 'ubuntu-lts',
         "compile_python": False,
         "python_version": '3.4.3',
         "python_basedir": '/usr',

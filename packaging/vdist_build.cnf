@@ -1,8 +1,11 @@
 [DEFAULT]
 app = vdist
 # All version tags, even bintray json descriptors, are automatically updated from next value.
-version = 1.6.0
-source_git = https://github.com/dante-signal31/${app}, master
+version = 2.0.0
+; This configurations only works for Travis builds.
+source_directory = /home/travis/build/dante-signal31/${app}
+; If you want to build locally uncomment next line and customify for your own case.
+; source_directory = /home/dante/Projects/${app}
 fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     https://github.com/dante-signal31/${app} --description
     "vdist (Virtualenv Distribute) is a tool that lets you build OS packages
@@ -13,15 +16,15 @@ fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     --license MIT --category net
 requirements_path = ./requirements.txt
 compile_python = True
-python_version = 3.6.5
+python_version = 3.7.5
 output_folder = ./package_dist/
 after_install = packaging/postinst.sh
 after_remove = packaging/postuninst.sh
 
 [Ubuntu-package]
-profile = ubuntu-trusty
+profile = ubuntu-lts
 runtime_deps = libssl1.0.0, docker-ce
 
-[Centos7-package]
-profile = centos7
+[Centos-package]
+profile = centos
 runtime_deps = openssl, docker-ce
