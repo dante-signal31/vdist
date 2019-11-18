@@ -46,8 +46,8 @@ after_remove = packaging/postuninst.sh
 [Ubuntu-package]
 profile = ubuntu-lts
 
-[Centos7-package]
-profile = centos7
+[Centos-package]
+profile = centos
 ```
 
 Running vdist with last configuration file will place generated packages at path
@@ -56,7 +56,7 @@ relative one, then reference folder is the one where you are when vdist command
 is called. **Always set *output_folder* variable**.
 
 As you can see, there are three main **sections** in previous configuration: DEFAULT,
-Ubuntu-package, Centos7-package. You can name each section as you want but
+Ubuntu-package, Centos-package. You can name each section as you want but
 DEFAULT that should always exists in your configurations because, as its name
 suggest, it contains default values that will apply to all of your packages
 unless one of the sections overrides any of the values. Write a section for
@@ -103,8 +103,8 @@ after_remove = packaging/postuninst.sh
 [Ubuntu-package]
 profile = ubuntu-lts
 
-[Centos7-package]
-profile = centos7
+[Centos-package]
+profile = centos
 ```
 
 You can put your file whatever name and extension you want.
@@ -197,8 +197,9 @@ resulting package
 OS package both in the name and in its meta information
 - `profile` :: the name of the profile to use for this specific build; its
 value should be one of two things:
-    * a vdist built-in profile (currently `centos7`, `ubuntu-lts` and
-    `debian-wheezy` are available)
+    * a vdist built-in profile (currently `centos`, `ubuntu-lts` and
+    `debian-wheezy` are available, `centos7`, `ubuntu-trusty` are deprecated 
+    and will be removed soon).
     * a custom profile that you create yourself; see
     [How to customize](http://vdistdocs.readthedocs.io/en/latest/howtocustomize/)
     for instructions
@@ -291,10 +292,10 @@ profiles_path = os.path.dirname(os.path.abspath(__file__))
 
 builder = Builder(profiles_dir='%s/deploy/profiles' % profiles_path)
 
-# Add CentOS7 build
+# Add CentOS build
 builder.add_build(
     # Name of the build
-    name='myproject :: centos6 build',
+    name='myproject :: centos build',
 
     # Name of the app (used for the package name)
     app='myproject',
@@ -307,8 +308,8 @@ builder.add_build(
     # vdist in the context of a CI environment
     source=directory(path='/home/ci/projects/myproject'),
 
-    # Use the 'centos7' profile
-    profile='centos7',
+    # Use the 'centos' profile
+    profile='centos',
 
     # Do not compile Python during packaging, a custom Python interpreter is
     # already made available on the build machine

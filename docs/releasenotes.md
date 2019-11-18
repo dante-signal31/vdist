@@ -1,10 +1,18 @@
 ## Release notes
 
-### 1.8.0 (2019/01/11)
-- "Ubuntu-trusty" profile is now deprecated. Included an "ubuntu-lts" instead. This 
+### 2.0.0 (2019/01/11)
+- "ubuntu-trusty" profile is now deprecated. Included an "ubuntu-lts" instead. This 
 new profile will point to current Ubuntu Long Term Support version. Be aware that this
 means that docker image used with this profile will change in the moment Ubuntu
 team upload a new version tagged as LTS.
+- Added a new profile "centos" that point to latest centos version. Be aware
+that that docker image will change as happens with the one related to "ubunu-lts".
+- "centos7" profile marked as deprecated. It will be removed soon.
+- "centos6" profile is broken. I've not been able to make it work again so I've
+removed it from available profiles. I'm going to keep centos6 related code for a 
+time just in case anyone find a way to fix it. As time passes that code will be 
+entirely removed.
+
 
 ### 1.7.5 (2019/04/15)
 - Fixed wrong URL at manpage.
