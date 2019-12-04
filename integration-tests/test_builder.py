@@ -100,6 +100,17 @@ def _generate_deb(builder_parameters):
     return target_file
 
 
+def _generate_pkg(builder_parameters):
+    _call_builder(builder_parameters)
+    pkg_filename_prefix = "_".join([builder_parameters["app"],
+                                    builder_parameters["version"]])
+    target_file = os.path.join(builder_parameters["output_folder"],
+                               "".join([pkg_filename_prefix, '-x86_64.pkg.tar.xz']))
+    assert os.path.isfile(target_file)
+    assert os.path.getsize(target_file) > 0
+    return target_file
+
+
 def _get_purged_deb_file_list(deb_filepath, file_filter):
     file_list = _read_deb_contents(deb_filepath)
     file_list_purged = _purge_list(file_list, file_filter)
@@ -624,37 +635,74 @@ def test_generate_rpm_from_git_directory_centos7():
     _generate_rpm_from_git_directory("centos7")
 
 
+def _populate_directory(temp_dir):
+    ci_tools.run_console_command("git clone {} {}".format(VDIST_GITHUB_REPOSITORY,
+                                                          temp_dir))
+    ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
+
+def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
+    builder_configurations = {
+        "vdist-test-generate-deb-from-dir": {
+            "app": app_name,
+            "version": '1.0',
+            "source": directory(path=temp_dir, ),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
+        },
+        'vdist-test-generate-rpm-from-dir': {
+            "app": 'vdist-test-generate-rpm-from-dir',
+            "version": '1.0',
+            "source": directory(path=temp_dir, ),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
+        },
+        "vdist-test-generate-pkg-from-dir": {
+            "app": app_name,
+            "version": '1.0',
+            "source": directory(path=temp_dir, ),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
+        },
+    }
+    return builder_configurations[app_name]
+
 @pytest.mark.deb
 def test_generate_deb_from_directory():
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
         os.chdir(temp_dir)
-        ci_tools.run_console_command("git clone {} {}".format(VDIST_GITHUB_REPOSITORY,
-                                                              temp_dir))
-        ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
-
-        builder_parameters = {"app": 'vdist-test-generate-deb-from-dir',
-                              "version": '1.0',
-                              "source": directory(path=temp_dir, ),
-                              "profile": 'ubuntu-lts',
-                              "output_folder": output_dir,
-                              "output_script": True}
+        _populate_directory(temp_dir)
+        builder_parameters = _get_builder_parameters('vdist-test-generate-deb-from-dir',
+                                                     "ubuntu-lts",
+                                                      temp_dir,
+                                                      output_dir)
         _ = _generate_deb(builder_parameters)
+
+
+@pytest.mark.pkg
+def test_generate_pkg_from_directory():
+    with temporary_directory() as temp_dir, temporary_directory() as output_dir:
+        os.chdir(temp_dir)
+        _populate_directory(temp_dir)
+        builder_parameters = _get_builder_parameters('vdist-test-generate-pkg-from-dir',
+                                                     "archlinux",
+                                                      temp_dir,
+                                                      output_dir)
+        _ = _generate_pkg(builder_parameters)
 
 
 def _generate_rpm_from_directory(centos_version):
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
         os.chdir(temp_dir)
-        ci_tools.run_console_command("git clone {} {}".format(VDIST_GITHUB_REPOSITORY,
-                                                              temp_dir))
-        ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
-
-        builder_parameters = {"app": 'vdist-test-generate-deb-from-dir',
-                              "version": '1.0',
-                              "source": directory(path=temp_dir, ),
-                              "profile": centos_version,
-                              "output_folder": output_dir,
-                              "output_script": True}
+        _populate_directory(temp_dir)
+        builder_parameters =  _get_builder_parameters('vdist-test-generate-rpm-from-dir',
+                                                      centos_version,
+                                                      temp_dir,
+                                                      output_dir)
         _ = _generate_rpm(builder_parameters)
+
 
 @pytest.mark.rpm
 @pytest.mark.centos
