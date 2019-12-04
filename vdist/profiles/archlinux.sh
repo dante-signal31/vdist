@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# TODO: Customize for Archlinux.
 PYTHON_VERSION="{{python_version}}"
 PYTHON_BASEDIR="{{python_basedir}}"
 
@@ -8,17 +7,16 @@ set -e
 
 {% if build_deps %}
 # Refresh repositories list to avoid problems with too old databases.
-apt-get update
+pacman -Syu --noconfirm
 # Install build dependencies.
-apt-get install -y {{build_deps|join(' ')}}
+pacman -S --noconfirm {{build_deps|join(' ')}}
 {% endif %}
 
 {% if compile_python %}
 # Download and compile what is going to be the Python we are going to use
 # as our portable python environment.
     # Since Python 3.7 you need libffi to compile it.
-    apt-get update
-    apt-get install libffi-dev
+    pacman -Syu --noconfirm
     cd /var/tmp
     curl -O https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz
     tar xzvf Python-$PYTHON_VERSION.tgz
@@ -71,14 +69,6 @@ cd {{package_tmp_root}}
     {% set project_root = working_dir %}
 {% endif %}
 
-# We are going to remove any traces of a previous virtualenv that we could
-# have imported with project, to keep things clean.
-## TODO: Give it a second thought. It's odd to have virtualenv folders in a
-## code repository. Whereas you may have a folder called "lib" or "bin" that
-## you may want to package but it doesn't come from a virtualenv. Maybe we
-## should remove next line in a further revision.
-# rm -rf bin include lib local
-
 # To install our application and dependencies inside our portable python
 # environment we have to run setup.py and download from Pypi using our
 # portable python environment "python" and "pip" executables.
@@ -130,11 +120,11 @@ else
     mkdir -p {{package_install_root}}/{{app}}
     cp -r {{package_tmp_root}}/{{app}}/* {{package_install_root}}/{{app}}/.
     {% if custom_filename %}
-        fpm -s dir -t deb -n {{app}} -p {{package_tmp_root}}/{{custom_filename}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} {{package_install_root}}/{{project_root}} $PYTHON_BASEDIR
+        fpm -s dir -t pacman -n {{app}} -p {{package_tmp_root}}/{{custom_filename}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} {{package_install_root}}/{{project_root}} $PYTHON_BASEDIR
     {% else %}
-        fpm -s dir -t deb -n {{app}} -p {{package_tmp_root}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} {{package_install_root}}/{{project_root}} $PYTHON_BASEDIR
+        fpm -s dir -t pacman -n {{app}} -p {{package_tmp_root}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} {{package_install_root}}/{{project_root}} $PYTHON_BASEDIR
     {% endif %}
-    cp {{package_tmp_root}}/*deb {{shared_dir}}
+    cp {{package_tmp_root}}/*.pkg.tar.xz {{shared_dir}}
 fi
 
 chown -R {{local_uid}}:{{local_gid}} {{shared_dir}}
