@@ -106,11 +106,11 @@ find {{package_tmp_root}} -type d -name '.svn' -print0 | xargs -0 rm -rf
 # environment, so we package that environment.
 if $setup; then
     {% if custom_filename %}
-        fpm -s dir -t deb -n {{app}} -p {{package_tmp_root}}/{{custom_filename}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} $PYTHON_BASEDIR
+        fpm -s dir -t pacman -n {{app}} -p {{package_tmp_root}}/{{custom_filename}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} $PYTHON_BASEDIR
     {% else %}
-        fpm -s dir -t deb -n {{app}} -p {{package_tmp_root}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} $PYTHON_BASEDIR
+        fpm -s dir -t pacman -n {{app}} -p {{package_tmp_root}} -v {{version}} {% for dep in runtime_deps %} --depends {{dep}} {% endfor %} {{fpm_args}} $PYTHON_BASEDIR
     {% endif %}
-    cp {{package_tmp_root}}/*deb {{shared_dir}}
+    cp {{package_tmp_root}}/*.pkg.tar.xz {{shared_dir}}
 # If setup==false then our application is in a different folder than our
 # portable python environment. So we package both: our application folder and
 # the one with our python package environment. In this case packager should use

@@ -105,7 +105,7 @@ def _generate_pkg(builder_parameters):
     pkg_filename_prefix = "_".join([builder_parameters["app"],
                                     builder_parameters["version"]])
     target_file = os.path.join(builder_parameters["output_folder"],
-                               "".join([pkg_filename_prefix, '-x86_64.pkg.tar.xz']))
+                               "".join([pkg_filename_prefix, '-1-x86_64.pkg.tar.xz']))
     assert os.path.isfile(target_file)
     assert os.path.getsize(target_file) > 0
     return target_file

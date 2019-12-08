@@ -7,4 +7,5 @@ RUN set -e
 RUN pacman -Syu --noconfirm && \
     pacman -S ruby base-devel openssl sqlite3 gdbm readline bzip2 ncurses tk libffi git python-virtualenv curl python python-pip --noconfirm
 # FPM installation to bundle app built directories into a system package file.
-RUN gem install fpm
+# In ArchLinux --no-user-install to get system wide available install of FPM.
+RUN gem install fpm --no-user-install
