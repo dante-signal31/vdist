@@ -19,6 +19,9 @@ DEB_NOCOMPILE_FILTER = [r'[^\.]', r'^\.\.', r'\./$', r'^\.$', r'\./opt/$',
                         r'\./usr/share/doc/geolocate/$',
                         r'\./usr/share/doc/geolocate/changelog.gz$']
 RPM_COMPILE_FILTER = [r'\/usr/lib/.build-id']
+PKG_COMPILE_FILTER = [r'.MKTREE',
+                      r'.PKGINFO',
+                      r'.BUILDINFO']
 
 FPM_ARGS_GEOLOCATE = '--maintainer dante.signal31@gmail.com -a native --url ' \
            'https://github.com/dante-signal31/geolocate --description ' \
@@ -47,6 +50,16 @@ VDIST_TEST_BRANCH = "vdist_tests"
 temporary_directory = testing_tools.get_temporary_directory_context_manager()
 
 
+def _get_package_file_list(file_name):
+    readers = {
+        "deb": _read_deb_contents,
+        "rpm": _read_rpm_contents,
+        "xz": _read_pkg_contents
+    }
+    file_extension = os.path.splitext(file_name)[1].lstrip(".")
+    return readers[file_extension](file_name)
+
+
 def _read_deb_contents(deb_file_pathname):
     entries = os.popen("dpkg -c {0}".format(deb_file_pathname)).readlines()
     file_list = [entry.split()[-1] for entry in entries]
@@ -57,6 +70,13 @@ def _read_rpm_contents(rpm_file_pathname):
     entries = os.popen("rpm -qlp {0}".format(rpm_file_pathname)).readlines()
     file_list = [entry.rstrip("\n") for entry in entries
                  if entry.startswith("/")]
+    return file_list
+
+
+def _read_pkg_contents(pkg_file_pathname):
+    entries = os.popen("tar -Jtf {0}".format(pkg_file_pathname)).readlines()
+    file_list = ["/".join("", entry) for entry in entries
+                 if not entry.startswith(".")]
     return file_list
 
 
@@ -111,16 +131,22 @@ def _generate_pkg(builder_parameters):
     return target_file
 
 
-def _get_purged_deb_file_list(deb_filepath, file_filter):
-    file_list = _read_deb_contents(deb_filepath)
+def _get_purged_file_list(filepath, file_filter):
+    file_list = _get_package_file_list(filepath)
     file_list_purged = _purge_list(file_list, file_filter)
     return file_list_purged
 
 
-def _get_purged_rpm_file_list(rpm_filepath, file_filter):
-    file_list = _read_rpm_contents(rpm_filepath)
-    file_list_purged = _purge_list(file_list, file_filter)
-    return file_list_purged
+# def _get_purged_deb_file_list(deb_filepath, file_filter):
+#     file_list = _read_deb_contents(deb_filepath)
+#     file_list_purged = _purge_list(file_list, file_filter)
+#     return file_list_purged
+#
+#
+# def _get_purged_rpm_file_list(rpm_filepath, file_filter):
+#     file_list = _read_rpm_contents(rpm_filepath)
+#     file_list_purged = _purge_list(file_list, file_filter)
+#     return file_list_purged
 
 
 @pytest.mark.deb
@@ -228,8 +254,8 @@ def test_generate_deb_from_git_setup_compile():
             "output_script": True
         }
         target_file = _generate_deb(builder_parameters)
-        file_list_purged = _get_purged_deb_file_list(target_file,
-                                                     DEB_COMPILE_FILTER)
+        file_list_purged = _get_purged_file_list(target_file,
+                                                 DEB_COMPILE_FILTER)
         # At this point only a folder should remain if everything is correct.
         correct_install_path = "./opt/geolocate"
         assert all((True if correct_install_path in file_entry else False
@@ -260,8 +286,8 @@ def _generate_rpm_from_git_setup_compile(centos_version):
             "output_script": True
         }
         target_file = _generate_rpm(builder_parameters)
-        file_list_purged = _get_purged_rpm_file_list(target_file,
-                                                     RPM_COMPILE_FILTER)
+        file_list_purged = _get_purged_file_list(target_file,
+                                                 RPM_COMPILE_FILTER)
         # At this point only a folder should remain if everything is correct.
         correct_install_path = "/opt/vdist"
         assert all((True if correct_install_path in file_entry else False
@@ -302,7 +328,7 @@ def test_generate_deb_from_git_nosetup_compile():
                               "output_folder": output_dir,
                               "output_script": True}
         target_file = _generate_deb(builder_parameters)
-        file_list_purged = _get_purged_deb_file_list(target_file,
+        file_list_purged = _get_purged_file_list(target_file,
                                                      DEB_COMPILE_FILTER)
         # At this point only two folders should remain if everything is correct:
         # application folder and compiled interpreter folder.
@@ -332,8 +358,8 @@ def _generate_rpm_from_git_nosetup_compile(centos_version):
                               "output_folder": output_dir,
                               "output_script": True}
         target_file = _generate_rpm(builder_parameters)
-        purged_file_list = _get_purged_rpm_file_list(target_file,
-                                                     RPM_COMPILE_FILTER)
+        purged_file_list = _get_purged_file_list(target_file,
+                                                 RPM_COMPILE_FILTER)
         # At this point only two folders should remain if everything is correct:
         # application folder and compiled interpreter folder.
         correct_folders = ["/opt/jtrouble", "/opt/python"]
@@ -387,8 +413,8 @@ def test_generate_deb_from_git_setup_nocompile():
             "output_script": True
         }
         target_file = _generate_deb(builder_parameters)
-        file_list_purged = _get_purged_deb_file_list(target_file,
-                                                     DEB_NOCOMPILE_FILTER)
+        file_list_purged = _get_purged_file_list(target_file,
+                                                 DEB_NOCOMPILE_FILTER)
         # At this point only a folder should remain if everything is correct.
         correct_install_path = "./root/custom_python"
         odd_entries = []
@@ -462,89 +488,6 @@ def _generate_rpm_from_git_setup_nocompile(centos_version):
 #
 # def test_generate_rpm_from_git_setup_nocompile_centos7():
 #     _generate_rpm_from_git_setup_nocompile("centos7")
-
-
-# Scenario 4.- Project not containing a setup.py and using a prebuilt Python
-# package -> package both the project dir and the Python basedir
-@pytest.mark.deb
-def test_generate_deb_from_git_nosetup_nocompile():
-    with temporary_directory() as output_dir:
-        builder_parameters = {
-            "app": 'jtrouble',
-            "version": '1.0.0',
-            "source": git(
-                uri='https://github.com/objectified/jtrouble',
-                branch='master'
-            ),
-            "profile": 'ubuntu-lts-custom',
-            "compile_python": False,
-            # Here happens the same than in
-            # test_generate_deb_from_git_setup_nocompile()
-            # "python_version": '3.4.4',
-            "python_basedir": '/root/custom_python',
-            "output_folder": output_dir,
-            "output_script": True
-        }
-        target_file = _generate_deb(builder_parameters)
-        file_list_purged = _get_purged_deb_file_list(target_file,
-                                                     DEB_NOCOMPILE_FILTER)
-        # At this point only two folders should remain if everything is correct:
-        # application folder and python basedir folder.
-        correct_folders = ["./opt/jtrouble", "./usr", "./root/custom_python"]
-        assert all((True if any(folder in file_entry for folder in correct_folders)
-                    else False
-                    for file_entry in file_list_purged))
-        # If python basedir was properly packaged then /usr/bin/python should be
-        # there.
-        python_interpreter = "./root/custom_python/bin/python3.7"
-        assert python_interpreter in file_list_purged
-
-
-def _generate_rpm_from_git_nosetup_nocompile(centos_version):
-    with temporary_directory() as output_dir:
-        builder_parameters = {
-            "app": 'jtrouble',
-            "version": '1.0.0',
-            "source": git(
-                uri='https://github.com/objectified/jtrouble',
-                branch='master'
-            ),
-            "profile": centos_version,
-            "compile_python": False,
-            # Here happens the same than in
-            # test_generate_deb_from_git_setup_nocompile()
-            # "python_version": '3.4.4',
-            "python_basedir": '/root/custom_python',
-            "output_folder": output_dir,
-            "output_script": True
-        }
-        target_file = _generate_rpm(builder_parameters)
-        purged_file_list = _get_purged_rpm_file_list(target_file,
-                                                     RPM_COMPILE_FILTER)
-        # At this point only two folders should remain if everything is correct:
-        # application folder and python basedir folder.
-        correct_folders = ["/opt/jtrouble", "/root/custom_python"]
-        assert all((True if any(folder in file_entry for folder in correct_folders)
-                    else False
-                    for file_entry in purged_file_list))
-        # If python basedir was properly packaged then /usr/bin/python should be
-        # there.
-        python_interpreter = "/root/custom_python/bin/python3"
-        assert python_interpreter in purged_file_list
-
-@pytest.mark.rpm
-@pytest.mark.centos
-def test_generate_rpm_from_git_nosetup_nocompile_centos():
-    _generate_rpm_from_git_nosetup_nocompile("centos-custom")
-
-
-# TODO: This test fails <<<<<<<<<<<<<
-# WARNING: Something wrong happens with "nocompile" tests in centos7.
-# I don't know why fpm call corrupts some lib in the linux container so
-# further cp command fails. This does not happen in centos or debian even
-# when fpm commands are the same. Any help with this issue will be welcome.
-# def test_generate_rpm_from_git_nosetup_nocompile_centos7():
-#     _generate_rpm_from_git_nosetup_nocompile("centos7-custom")
 
 def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     builder_configurations = {
@@ -631,9 +574,135 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "profile": profile_name,
             "output_folder": output_dir,
             "output_script": True
+        },
+        "jtrouble_nosetup_nocompile": {
+            "app": 'jtrouble',
+            "version": '1.0.0',
+            "source": git(
+                uri='https://github.com/objectified/jtrouble',
+                branch='master'
+            ),
+            "profile": profile_name,
+            "compile_python": False,
+            # Here happens the same than in
+            # test_generate_deb_from_git_setup_nocompile()
+            # "python_version": '3.4.4',
+            "python_basedir": '/root/custom_python',
+            "output_folder": output_dir,
+            "output_script": True
         }
     }
     return builder_configurations[app_name]
+
+
+# Scenario 4.- Project not containing a setup.py and using a prebuilt Python
+# package -> package both the project dir and the Python basedir
+@pytest.mark.deb
+@pytest.mark.generate_from_git_nosetup_nocompile
+def test_generate_deb_from_git_nosetup_nocompile():
+    # with temporary_directory() as output_dir:
+    #     builder_parameters = _get_builder_parameters("jtrouble_nosetup_nocompile",
+    #                                                  "ubuntu-lts-custom,"
+    #                                                  "",
+    #                                                  output_dir)
+    #     target_file = _generate_deb(builder_parameters)
+    #     file_list_purged = _get_purged_file_list(target_file,
+    #                                                  DEB_NOCOMPILE_FILTER)
+    #     # At this point only two folders should remain if everything is correct:
+    #     # application folder and python basedir folder.
+    #     correct_folders = ["./opt/jtrouble", "./usr", "./root/custom_python"]
+    #     assert all((True if any(folder in file_entry for folder in correct_folders)
+    #                 else False
+    #                 for file_entry in file_list_purged))
+    #     # If python basedir was properly packaged then /usr/bin/python should be
+    #     # there.
+    #     python_interpreter = "./root/custom_python/bin/python3.7"
+    #     assert python_interpreter in file_list_purged
+    _generate_package_from_git_nosetup_nocompile("ubuntu-lts-custom",
+                                                 "jtrouble_nosetup_nocompile",
+                                                 _generate_deb,
+                                                 DEB_NOCOMPILE_FILTER,
+                                                 ["./opt/jtrouble", "./usr", "./root/custom_python"],
+                                                 "./root/custom_python/bin/python3.7")
+
+
+@pytest.mark.rpm
+@pytest.mark.centos
+@pytest.mark.generate_from_git_nosetup_nocompile
+def test_generate_rpm_from_git_nosetup_nocompile_centos():
+    _generate_rpm_from_git_nosetup_nocompile("centos-custom")
+
+
+# TODO: This test fails <<<<<<<<<<<<<
+# WARNING: Something wrong happens with "nocompile" tests in centos7.
+# I don't know why fpm call corrupts some lib in the linux container so
+# further cp command fails. This does not happen in centos or debian even
+# when fpm commands are the same. Any help with this issue will be welcome.
+# def test_generate_rpm_from_git_nosetup_nocompile_centos7():
+#     _generate_rpm_from_git_nosetup_nocompile("centos7-custom")
+
+
+def _generate_rpm_from_git_nosetup_nocompile(centos_version):
+    # with temporary_directory() as output_dir:
+    #     builder_parameters = _get_builder_parameters("jtrouble_nosetup_nocompile",
+    #                                                   centos_version,
+    #                                                   "",
+    #                                                   output_dir)
+    #     target_file = _generate_rpm(builder_parameters)
+    #     purged_file_list = _get_purged_file_list(target_file,
+    #                                                  RPM_COMPILE_FILTER)
+    #     # At this point only two folders should remain if everything is correct:
+    #     # application folder and python basedir folder.
+    #     correct_folders = ["/opt/jtrouble", "/root/custom_python"]
+    #     assert all((True if any(folder in file_entry for folder in correct_folders)
+    #                 else False
+    #                 for file_entry in purged_file_list))
+    #     # If python basedir was properly packaged then /usr/bin/python should be
+    #     # there.
+    #     python_interpreter = "/root/custom_python/bin/python3"
+    #     assert python_interpreter in purged_file_list
+    _generate_package_from_git_nosetup_nocompile(centos_version,
+                                                 "jtrouble_nosetup_nocompile",
+                                                 _generate_rpm,
+                                                 RPM_COMPILE_FILTER,
+                                                 ["/opt/jtrouble", "/root/custom_python"],
+                                                 "/root/custom_python/bin/python3")
+
+
+@pytest.mark.pkg
+@pytest.mark.generate_from_git_nosetup_nocompile
+def test_generate_pkg_from_git_nosetup_nocompile():
+    ## TODO: Create archlinux docker custom image.
+    _generate_package_from_git_nosetup_nocompile("archlinux",
+                                                 "jtrouble_nosetup_nocompile",
+                                                 _generate_pkg,
+                                                 PKG_COMPILE_FILTER,
+                                                 ["/opt/jtrouble", "/root/custom_python"],
+                                                 "/root/custom_python/bin/python3")
+
+
+def _generate_package_from_git_nosetup_nocompile(distro,
+                                                 package_name,
+                                                 packager_function,
+                                                 compile_filter,
+                                                 correct_folders,
+                                                 python_interpreter):
+    with temporary_directory() as output_dir:
+        builder_parameters =  _get_builder_parameters(package_name,
+                                                      distro,
+                                                      "",
+                                                      output_dir)
+        target_file = packager_function(builder_parameters)
+        purged_file_list = _get_purged_file_list(target_file,
+                                                 compile_filter)
+        # At this point only two folders should remain if everything is correct:
+        # application folder and python basedir folder.
+        assert all((True if any(folder in file_entry for folder in correct_folders)
+                    else False
+                    for file_entry in purged_file_list))
+        # If python basedir was properly packaged then /usr/bin/python should be
+        # there."
+        assert python_interpreter in purged_file_list
 
 
 @pytest.mark.deb
