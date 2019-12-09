@@ -629,6 +629,15 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "profile": profile_name,
             "output_folder": output_dir,
             "output_script": True
+        },
+        "vdist-test-generate-pkg-from-git-dir": {
+            "app": 'vdist-test-generate-pkg-from-git-dir',
+            "version": '1.0',
+            "source": git_directory(path=temp_dir,
+                                    branch='vdist_tests'),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
         }
     }
     return builder_configurations[app_name]
@@ -637,30 +646,38 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
 @pytest.mark.deb
 @pytest.mark.generate_from_git_directory
 def test_generate_deb_from_git_directory():
-    _generate_package_from_git_directory("ubuntu-lts", _generate_deb)
+    _generate_package_from_git_directory("ubuntu-lts",
+                                         "vdist-test-generate-deb-from-git-dir",
+                                         _generate_deb)
 
 
 @pytest.mark.rpm
 @pytest.mark.centos
 @pytest.mark.generate_from_git_directory
 def test_generate_rpm_from_git_directory_centos():
-    _generate_package_from_git_directory("centos", _generate_rpm)
+    _generate_package_from_git_directory("centos",
+                                         "vdist-test-generate-rpm-from-git-dir",
+                                         _generate_rpm)
 
 
 @pytest.mark.rpm
 @pytest.mark.centos7
 @pytest.mark.generate_from_git_directory
 def test_generate_rpm_from_git_directory_centos7():
-    _generate_package_from_git_directory("centos7", _generate_rpm)
+    _generate_package_from_git_directory("centos7",
+                                         "vdist-test-generate-rpm-from-git-dir",
+                                         _generate_rpm)
 
 
 @pytest.mark.pkg
 @pytest.mark.generate_from_git_directory
 def test_generate_pkg_from_git_directory():
-    _generate_package_from_git_directory("archlinux", _generate_pkg)
+    _generate_package_from_git_directory("archlinux",
+                                         "vdist-test-generate-pkg-from-git-dir",
+                                         _generate_pkg)
 
 
-def _generate_package_from_git_directory(profile_name, packager_function):
+def _generate_package_from_git_directory(distro, package_name, packager_function):
     with temporary_directory() as temp_dir, temporary_directory() as output_dir:
         git_p = subprocess.Popen(
             ['git', 'clone',
@@ -668,13 +685,10 @@ def _generate_package_from_git_directory(profile_name, packager_function):
              temp_dir])
         git_p.communicate()
 
-        builder_parameters = {"app": 'vdist-test-generate-rpm-from-git-dir',
-                              "version": '1.0',
-                              "source": git_directory(path=temp_dir,
-                                                      branch='vdist_tests'),
-                              "profile": profile_name,
-                              "output_folder": output_dir,
-                              "output_script": True}
+        builder_parameters = _get_builder_parameters(package_name,
+                                                     distro,
+                                                     temp_dir,
+                                                     output_dir)
         _ = packager_function(builder_parameters)
 
 
