@@ -640,6 +640,7 @@ def _populate_directory(temp_dir):
                                                           temp_dir))
     ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
 
+
 def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     builder_configurations = {
         "vdist-test-generate-deb-from-dir": {
@@ -669,48 +670,51 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     }
     return builder_configurations[app_name]
 
+
 @pytest.mark.deb
+@pytest.mark.generate_from_directory
 def test_generate_deb_from_directory():
-    with temporary_directory() as temp_dir, temporary_directory() as output_dir:
-        os.chdir(temp_dir)
-        _populate_directory(temp_dir)
-        builder_parameters = _get_builder_parameters('vdist-test-generate-deb-from-dir',
-                                                     "ubuntu-lts",
-                                                      temp_dir,
-                                                      output_dir)
-        _ = _generate_deb(builder_parameters)
+    _generate_package_from_directory("ubuntu-lts",
+                                     "vdist-test-generate-deb-from-dir",
+                                     _generate_deb)
 
 
 @pytest.mark.pkg
+@pytest.mark.generate_from_directory
 def test_generate_pkg_from_directory():
-    with temporary_directory() as temp_dir, temporary_directory() as output_dir:
-        os.chdir(temp_dir)
-        _populate_directory(temp_dir)
-        builder_parameters = _get_builder_parameters('vdist-test-generate-pkg-from-dir',
-                                                     "archlinux",
-                                                      temp_dir,
-                                                      output_dir)
-        _ = _generate_pkg(builder_parameters)
-
-
-def _generate_rpm_from_directory(centos_version):
-    with temporary_directory() as temp_dir, temporary_directory() as output_dir:
-        os.chdir(temp_dir)
-        _populate_directory(temp_dir)
-        builder_parameters =  _get_builder_parameters('vdist-test-generate-rpm-from-dir',
-                                                      centos_version,
-                                                      temp_dir,
-                                                      output_dir)
-        _ = _generate_rpm(builder_parameters)
+    _generate_package_from_directory("archlinux",
+                                     "vdist-test-generate-pkg-from-dir",
+                                     _generate_pkg)
 
 
 @pytest.mark.rpm
 @pytest.mark.centos
+@pytest.mark.generate_from_directory
 def test_generate_rpm_from_directory_centos():
-    _generate_rpm_from_directory("centos")
+    _generate_package_from_directory("centos",
+                                     "vdist-test-generate-rpm-from-dir",
+                                     _generate_rpm)
+
 
 @pytest.mark.rpm
 @pytest.mark.centos7
+@pytest.mark.generate_from_directory
 def test_generate_rpm_from_directory_centos7():
-    _generate_rpm_from_directory("centos7")
+    _generate_package_from_directory("centos7",
+                                     "vdist-test-generate-rpm-from-dir",
+                                     _generate_rpm)
+
+
+def _generate_package_from_directory(distro, package_name, packager_function):
+    with temporary_directory() as temp_dir, temporary_directory() as output_dir:
+        os.chdir(temp_dir)
+        _populate_directory(temp_dir)
+        builder_parameters = _get_builder_parameters(package_name,
+                                                     distro,
+                                                     temp_dir,
+                                                     output_dir)
+        _ = packager_function(builder_parameters)
+
+
+
 
