@@ -546,46 +546,6 @@ def test_generate_rpm_from_git_nosetup_nocompile_centos():
 # def test_generate_rpm_from_git_nosetup_nocompile_centos7():
 #     _generate_rpm_from_git_nosetup_nocompile("centos7-custom")
 
-@pytest.mark.deb
-def test_generate_deb_from_git_suffixed():
-    with temporary_directory() as output_dir:
-        builder_parameters = {"app": 'vdist-test-generate-deb-from-git-suffixed',
-                              "version": '1.0',
-                              "source": git(
-                                uri='https://github.com/dante-signal31/vdist.git',
-                                branch='vdist_tests'
-                              ),
-                              "profile": 'ubuntu-lts',
-                              "output_folder": output_dir,
-                              "output_script": True}
-        _ = _generate_deb(builder_parameters)
-
-
-def _generate_rpm_from_git_suffixed(centos_version):
-    with temporary_directory() as output_dir:
-        builder_parameters = {"app": 'vdist-test-generate-deb-from-git-suffixed',
-                              "version": '1.0',
-                              "source": git(
-                                uri='https://github.com/dante-signal31/vdist.git',
-                                branch='vdist_tests'
-                              ),
-                              "profile": centos_version,
-                              "output_folder": output_dir,
-                              "output_script": True}
-        _ = _generate_rpm(builder_parameters)
-
-
-@pytest.mark.rpm
-@pytest.mark.centos
-def test_generate_rpm_from_git_suffixed_centos():
-    _generate_rpm_from_git_suffixed("centos")
-
-@pytest.mark.rpm
-@pytest.mark.centos7
-def test_generate_rpm_from_git_suffixed_centos7():
-    _generate_rpm_from_git_suffixed("centos7")
-
-
 def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     builder_configurations = {
         "vdist-test-generate-deb-from-dir": {
@@ -622,7 +582,7 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "output_script": True
         },
         "vdist-test-generate-rpm-from-git-dir": {
-            "app": 'vdist-test-generate-rpm-from-git-dir',
+            "app": app_name,
             "version": '1.0',
             "source": git_directory(path=temp_dir,
                                     branch='vdist_tests'),
@@ -631,16 +591,91 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "output_script": True
         },
         "vdist-test-generate-pkg-from-git-dir": {
-            "app": 'vdist-test-generate-pkg-from-git-dir',
+            "app": app_name,
             "version": '1.0',
             "source": git_directory(path=temp_dir,
                                     branch='vdist_tests'),
             "profile": profile_name,
             "output_folder": output_dir,
             "output_script": True
+        },
+        "vdist-test-generate-deb-from-git-suffixed": {
+            "app": app_name,
+            "version": '1.0',
+            "source": git(
+                uri='https://github.com/dante-signal31/vdist.git',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
+        },
+        "vdist-test-generate-rpm-from-git-suffixed": {
+            "app": app_name,
+            "version": '1.0',
+            "source": git(
+                uri='https://github.com/dante-signal31/vdist.git',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
+        },
+        "vdist-test-generate-pkg-from-git-suffixed": {
+            "app": app_name,
+            "version": '1.0',
+            "source": git(
+                uri='https://github.com/dante-signal31/vdist.git',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
         }
     }
     return builder_configurations[app_name]
+
+
+@pytest.mark.deb
+@pytest.mark.generate_from_git_suffixed
+def test_generate_deb_from_git_suffixed():
+    _generate_package_from_git_suffixed("ubuntu-lts",
+                                        "vdist-test-generate-deb-from-git-suffixed",
+                                        _generate_deb)
+
+@pytest.mark.rpm
+@pytest.mark.centos
+@pytest.mark.generate_from_git_suffixed
+def test_generate_rpm_from_git_suffixed_centos():
+    _generate_package_from_git_suffixed("centos",
+                                        "vdist-test-generate-rpm-from-git-suffixed",
+                                        _generate_rpm)
+
+
+@pytest.mark.rpm
+@pytest.mark.centos7
+@pytest.mark.generate_from_git_suffixed
+def test_generate_rpm_from_git_suffixed_centos7():
+    _generate_package_from_git_suffixed("centos7",
+                                        "vdist-test-generate-rpm-from-git-suffixed",
+                                        _generate_rpm)
+
+
+@pytest.mark.pkg
+@pytest.mark.generate_from_git_suffixed
+def test_generate_pkg_from_git_suffixed():
+    _generate_package_from_git_suffixed("archlinux",
+                                        "vdist-test-generate-pkg-from-git-suffixed",
+                                        _generate_pkg)
+
+
+def _generate_package_from_git_suffixed(distro, package_name, packager_function):
+    with temporary_directory() as output_dir:
+        builder_parameters = _get_builder_parameters(package_name,
+                                                     distro,
+                                                     "",
+                                                     output_dir)
+        _ = packager_function(builder_parameters)
 
 
 @pytest.mark.deb
