@@ -37,5 +37,9 @@
     "archlinux": {
         "docker_image": "dantesignal31/vdist-aux:archlinux",
         "script": "archlinux.sh"
+    },
+    "archlinux-custom": {
+      "docker_image": "dantesignal31/vdist-aux:archlinux-custom",
+      "script": "archlinux.sh"
     }
 }
