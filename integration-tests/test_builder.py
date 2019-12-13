@@ -75,7 +75,7 @@ def _read_rpm_contents(rpm_file_pathname):
 
 def _read_pkg_contents(pkg_file_pathname):
     entries = os.popen("tar -Jtf {0}".format(pkg_file_pathname)).readlines()
-    file_list = ["/".join("", entry) for entry in entries
+    file_list = ["/".join(["", entry]).rstrip("\n") for entry in entries
                  if not entry.startswith(".")]
     return file_list
 
@@ -600,24 +600,6 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
 @pytest.mark.deb
 @pytest.mark.generate_from_git_nosetup_nocompile
 def test_generate_deb_from_git_nosetup_nocompile():
-    # with temporary_directory() as output_dir:
-    #     builder_parameters = _get_builder_parameters("jtrouble_nosetup_nocompile",
-    #                                                  "ubuntu-lts-custom,"
-    #                                                  "",
-    #                                                  output_dir)
-    #     target_file = _generate_deb(builder_parameters)
-    #     file_list_purged = _get_purged_file_list(target_file,
-    #                                                  DEB_NOCOMPILE_FILTER)
-    #     # At this point only two folders should remain if everything is correct:
-    #     # application folder and python basedir folder.
-    #     correct_folders = ["./opt/jtrouble", "./usr", "./root/custom_python"]
-    #     assert all((True if any(folder in file_entry for folder in correct_folders)
-    #                 else False
-    #                 for file_entry in file_list_purged))
-    #     # If python basedir was properly packaged then /usr/bin/python should be
-    #     # there.
-    #     python_interpreter = "./root/custom_python/bin/python3.7"
-    #     assert python_interpreter in file_list_purged
     _generate_package_from_git_nosetup_nocompile("ubuntu-lts-custom",
                                                  "jtrouble_nosetup_nocompile",
                                                  _generate_deb,
@@ -643,24 +625,6 @@ def test_generate_rpm_from_git_nosetup_nocompile_centos():
 
 
 def _generate_rpm_from_git_nosetup_nocompile(centos_version):
-    # with temporary_directory() as output_dir:
-    #     builder_parameters = _get_builder_parameters("jtrouble_nosetup_nocompile",
-    #                                                   centos_version,
-    #                                                   "",
-    #                                                   output_dir)
-    #     target_file = _generate_rpm(builder_parameters)
-    #     purged_file_list = _get_purged_file_list(target_file,
-    #                                                  RPM_COMPILE_FILTER)
-    #     # At this point only two folders should remain if everything is correct:
-    #     # application folder and python basedir folder.
-    #     correct_folders = ["/opt/jtrouble", "/root/custom_python"]
-    #     assert all((True if any(folder in file_entry for folder in correct_folders)
-    #                 else False
-    #                 for file_entry in purged_file_list))
-    #     # If python basedir was properly packaged then /usr/bin/python should be
-    #     # there.
-    #     python_interpreter = "/root/custom_python/bin/python3"
-    #     assert python_interpreter in purged_file_list
     _generate_package_from_git_nosetup_nocompile(centos_version,
                                                  "jtrouble_nosetup_nocompile",
                                                  _generate_rpm,
@@ -672,12 +636,11 @@ def _generate_rpm_from_git_nosetup_nocompile(centos_version):
 @pytest.mark.pkg
 @pytest.mark.generate_from_git_nosetup_nocompile
 def test_generate_pkg_from_git_nosetup_nocompile():
-    ## TODO: Create archlinux docker custom image.
-    _generate_package_from_git_nosetup_nocompile("archlinux",
+    _generate_package_from_git_nosetup_nocompile("archlinux-custom",
                                                  "jtrouble_nosetup_nocompile",
                                                  _generate_pkg,
                                                  PKG_COMPILE_FILTER,
-                                                 ["/opt/jtrouble", "/root/custom_python"],
+                                                 ["/root", "/opt", "/opt/jtrouble", "/root/custom_python"],
                                                  "/root/custom_python/bin/python3")
 
 
@@ -700,7 +663,7 @@ def _generate_package_from_git_nosetup_nocompile(distro,
         assert all((True if any(folder in file_entry for folder in correct_folders)
                     else False
                     for file_entry in purged_file_list))
-        # If python basedir was properly packaged then /usr/bin/python should be
+        # If python basedir was properly packaged then python_interpreter path should be
         # there."
         assert python_interpreter in purged_file_list
 
