@@ -382,115 +382,10 @@ def test_generate_rpm_from_git_nosetup_compile_centos():
 def test_generate_rpm_from_git_nosetup_compile_centos7():
     _generate_rpm_from_git_nosetup_compile("centos7")
 
-
-# Scenario 3 - Project containing a setup.py and using a prebuilt Python package
-# (e.g. not compiling) -> package the custom Python basedir only.
-@pytest.mark.deb
-def test_generate_deb_from_git_setup_nocompile():
-    with temporary_directory() as output_dir:
-        builder_parameters = {
-            "app": 'geolocate',
-            "version": '1.4.1',
-            "source": git(
-                uri='https://github.com/dante-signal31/geolocate',
-                branch='vdist_tests'
-            ),
-            "profile": 'ubuntu-lts-custom',
-            "compile_python": False,
-            # "python_version": '3.5.3',
-            # Lets suppose custom python package is already installed and its root
-            # folder is /root/custom_python.
-            "python_basedir": '/root/custom_python',
-            "fpm_args": FPM_ARGS_GEOLOCATE,
-            "requirements_path": '/REQUIREMENTS.txt',
-            "build_deps": ["python3-all-dev", "build-essential", "libssl-dev",
-                           "pkg-config", "libdbus-glib-1-dev", "gnome-keyring",
-                           "libffi-dev"],
-            "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
-            "after_install": 'packaging/postinst.sh',
-            "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir,
-            "output_script": True
-        }
-        target_file = _generate_deb(builder_parameters)
-        file_list_purged = _get_purged_file_list(target_file,
-                                                 DEB_NOCOMPILE_FILTER)
-        # At this point only a folder should remain if everything is correct.
-        correct_install_path = "./root/custom_python"
-        odd_entries = []
-        for file_entry in file_list_purged:
-            if not "./root/custom_python" in file_entry:
-                odd_entries.append(file_entry)
-        assert all((True if correct_install_path in file_entry else False
-                    for file_entry in file_list_purged))
-        # If python basedir was properly packaged then /root/custom/bin/python should be
-        # there.
-        python_interpreter = "./root/custom_python/bin/python3.7"
-        assert python_interpreter in file_list_purged
-        # If application was properly packaged then launcher should be in bin folder
-        # too.
-        geolocate_launcher = "./root/custom_python/bin/geolocate"
-        assert geolocate_launcher in file_list_purged
-
-
-def _generate_rpm_from_git_setup_nocompile(centos_version):
-    with temporary_directory() as output_dir:
-        builder_parameters = {
-            "app": 'geolocate',
-            "version": '1.4.1',
-            "source": git(
-                uri='https://github.com/dante-signal31/geolocate',
-                branch='vdist_tests'
-            ),
-            "profile": centos_version,
-            "compile_python": False,
-            # "python_version": '3.4.4',
-            # Lets suppose custom python package is already installed and its root
-            # folder is '/root/custom_python'.
-            "python_basedir": '/root/custom_python',
-            "fpm_args": FPM_ARGS_GEOLOCATE,
-            "requirements_path": '/REQUIREMENTS.txt',
-            "build_deps": ["python3-all-dev", "build-essential", "libssl-dev",
-                           "pkg-config", "libdbus-glib-1-dev", "gnome-keyring",
-                           "libffi-dev"],
-            "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
-            "after_install": 'packaging/postinst.sh',
-            "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir,
-            "output_script": True
-        }
-        target_file = _generate_rpm(builder_parameters)
-        file_list = _read_rpm_contents(target_file)
-        # At this point only a folder should remain if everything is correct.
-        correct_install_path = "/usr"
-        assert all((True if correct_install_path in file_entry else False
-                    for file_entry in file_list))
-        # If python basedir was properly packaged then /usr/bin/python should be
-        # there.
-        python_interpreter = "/root/custom_python/bin/python3"
-        assert python_interpreter in file_list
-        # If application was properly packaged then launcher should be in bin folder
-        # too.
-        geolocate_launcher = "/root/custom_python/bin/geolocate"
-        assert geolocate_launcher in file_list
-
-
-# TODO: These tests fails <<<<<<<<<<<<<
-# WARNING: Something wrong happens with "nocompile" tests in centos7 and 6.
-# I don't know why fpm call corrupts some lib in the linux container so
-# further cp command fails. This does not happen in debian even
-# when fpm commands are the same. Any help with this issue will be welcome.
-# @pytest.mark.rpm
-# @pytest.mark.centos
-# def test_generate_rpm_from_git_setup_nocompile_centos():
-#     _generate_rpm_from_git_setup_nocompile("centos")
-#
-#
-# def test_generate_rpm_from_git_setup_nocompile_centos7():
-#     _generate_rpm_from_git_setup_nocompile("centos7")
-
 def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     builder_configurations = {
+        ## TODO: Some tests fail if I leave app_name at "app" but not hardcode it. Give it a second thought and leave coherent.
+        ## TODO: To much code redundancy in these configurations. See how to reduce it.
         "vdist-test-generate-deb-from-dir": {
             "app": app_name,
             "version": '1.0',
@@ -590,10 +485,164 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "python_basedir": '/root/custom_python',
             "output_folder": output_dir,
             "output_script": True
+        },
+        "geolocate-test-generate-deb-from-git-setup-nocompile": {
+            "app": 'geolocate',
+            "version": '1.4.1',
+            "source": git(
+                uri='https://github.com/dante-signal31/geolocate',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "compile_python": False,
+            # "python_version": '3.5.3',
+            # Lets suppose custom python package is already installed and its root
+            # folder is /root/custom_python.
+            "python_basedir": '/root/custom_python',
+            "fpm_args": FPM_ARGS_GEOLOCATE,
+            "requirements_path": '/REQUIREMENTS.txt',
+            "build_deps": ["python3-all-dev", "build-essential", "libssl-dev",
+                           "pkg-config", "libdbus-glib-1-dev", "gnome-keyring",
+                           "libffi-dev"],
+            "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
+            "after_install": 'packaging/postinst.sh',
+            "after_remove": 'packaging/postuninst.sh',
+            "output_folder": output_dir,
+            "output_script": True
+        },
+        "geolocate-test_generate_rpm_from_git_setup_nocompile_centos": {
+            "app": 'geolocate',
+            "version": '1.4.1',
+            "source": git(
+                uri='https://github.com/dante-signal31/geolocate',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "compile_python": False,
+            # "python_version": '3.4.4',
+            # Lets suppose custom python package is already installed and its root
+            # folder is '/root/custom_python'.
+            "python_basedir": '/root/custom_python',
+            "fpm_args": FPM_ARGS_GEOLOCATE,
+            "requirements_path": '/REQUIREMENTS.txt',
+            "build_deps": ["python3-all-dev", "build-essential", "libssl-dev",
+                           "pkg-config", "libdbus-glib-1-dev", "gnome-keyring",
+                           "libffi-dev"],
+            "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
+            "after_install": 'packaging/postinst.sh',
+            "after_remove": 'packaging/postuninst.sh',
+            "output_folder": output_dir,
+            "output_script": True
+        },
+        "geolocate-test-generate-pkg-from-git-setup-nocompile": {
+            "app": 'geolocate',
+            "version": '1.4.1',
+            "source": git(
+                uri='https://github.com/dante-signal31/geolocate',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "compile_python": False,
+            # "python_version": '3.4.4',
+            # Lets suppose custom python package is already installed and its root
+            # folder is '/root/custom_python'.
+            "python_basedir": '/root/custom_python',
+            "fpm_args": FPM_ARGS_GEOLOCATE,
+            "requirements_path": '/REQUIREMENTS.txt',
+            "build_deps": ["python3", "base-devel", "openssl",
+                           "pkg-config", "dbus-glib", "gnome-keyring",
+                           "libffi"],
+            "runtime_deps": ["openssl", "python-dbus", "gnome-keyring"],
+            "after_install": 'packaging/postinst.sh',
+            "after_remove": 'packaging/postuninst.sh',
+            "output_folder": output_dir,
+            "output_script": True
         }
     }
     return builder_configurations[app_name]
 
+
+# Scenario 3 - Project containing a setup.py and using a prebuilt Python package
+# (e.g. not compiling) -> package the custom Python basedir only.
+@pytest.mark.deb
+@pytest.mark.generate_from_git_setup_nocompile
+def test_generate_deb_from_git_setup_nocompile():
+    _generate_package_from_git_setup_nocompile("ubuntu-lts-custom",
+                                               "geolocate-test-generate-deb-from-git-setup-nocompile",
+                                               _generate_deb,
+                                               DEB_NOCOMPILE_FILTER,
+                                               ["./root/custom_python"],
+                                               "./root/custom_python/bin/python3.7",
+                                               "./root/custom_python/bin/geolocate")
+
+@pytest.mark.pkg
+@pytest.mark.generate_from_git_setup_nocompile
+def test_generate_pkg_from_git_setup_nocompile():
+    _generate_package_from_git_setup_nocompile("archlinux-custom",
+                                               "geolocate-test-generate-pkg-from-git-setup-nocompile",
+                                               _generate_pkg,
+                                               PKG_COMPILE_FILTER,
+                                               ["/root/", "/root/custom_python"],
+                                               "/root/custom_python/bin/python3.7",
+                                               "/root/custom_python/bin/geolocate")
+
+
+# TODO: These tests fails <<<<<<<<<<<<<
+# WARNING: Something wrong happens with "nocompile" tests in centos7 and 6.
+# I don't know why fpm call corrupts some lib in the linux container so
+# further cp command fails. This does not happen in debian even
+# when fpm commands are the same. Any help with this issue will be welcome.
+# @pytest.mark.rpm
+# @pytest.mark.centos
+# @pytest.mark.generate_from_git_setup_nocompile
+# def test_generate_rpm_from_git_setup_nocompile_centos():
+#     _generate_package_from_git_setup_nocompile("centos-custom",
+#                                                "geolocate-test_generate_rpm_from_git_setup_nocompile_centos",
+#                                                _generate_rpm,
+#                                                [],
+#                                                ["/usr"],
+#                                                "/root/custom_python/bin/python3",
+#                                                "/root/custom_python/bin/geolocate")
+#
+# @pytest.mark.rpm
+# @pytest.mark.centos7
+# @pytest.mark.generate_from_git_setup_nocompile
+# def test_generate_rpm_from_git_setup_nocompile_centos7():
+#     _generate_package_from_git_setup_nocompile("centos7-custom",
+#                                               "geolocate-test_generate_rpm_from_git_setup_nocompile_centos",
+#                                               _generate_rpm,
+#                                               [],
+#                                               ["/usr"],
+#                                               "/root/custom_python/bin/python3",
+#                                               "/root/custom_python/bin/geolocate")
+
+
+## TODO: This function code is almost identical to the one in _generate_package_from_git_nosetup_nocompile. Try to resolve redundancy.
+def _generate_package_from_git_setup_nocompile(distro,
+                                               package_name,
+                                               packager_function,
+                                               compile_filter,
+                                               correct_folders,
+                                               python_interpreter,
+                                               geolocate_launcher):
+    with temporary_directory() as output_dir:
+        builder_parameters = _get_builder_parameters(package_name,
+                                                     distro,
+                                                     "",
+                                                     output_dir)
+        target_file = packager_function(builder_parameters)
+        file_list_purged = _get_purged_file_list(target_file,
+                                                 compile_filter)
+        # At this point only a folder should remain if everything is correct.
+        assert all((True if any(folder in file_entry for folder in correct_folders)
+                    else False
+                    for file_entry in file_list_purged))
+        # If python basedir was properly packaged then /root/custom/bin/python should be
+        # there.
+        assert python_interpreter in file_list_purged
+        # If application was properly packaged then launcher should be in bin folder
+        # too.
+        assert geolocate_launcher in file_list_purged
 
 # Scenario 4.- Project not containing a setup.py and using a prebuilt Python
 # package -> package both the project dir and the Python basedir
