@@ -309,79 +309,6 @@ def test_generate_rpm_from_git_setup_compile_centos7():
     _generate_rpm_from_git_setup_compile("centos7")
 
 
-# Scenario 2.- Project not containing a setup.py and compiles Python -> package
-# both the project dir and the Python basedir
-@pytest.mark.deb
-def test_generate_deb_from_git_nosetup_compile():
-    with temporary_directory() as output_dir:
-        builder_parameters = {"app": 'jtrouble',
-                              "version": '1.0.0',
-                              "source": git(
-                                    uri='https://github.com/objectified/jtrouble',
-                                    branch='master'
-                              ),
-                              "profile": 'ubuntu-lts',
-                              "package_install_root": "/opt",
-                              "python_basedir": "/opt/python",
-                              "compile_python": True,
-                              "python_version": '3.4.4',
-                              "output_folder": output_dir,
-                              "output_script": True}
-        target_file = _generate_deb(builder_parameters)
-        file_list_purged = _get_purged_file_list(target_file,
-                                                     DEB_COMPILE_FILTER)
-        # At this point only two folders should remain if everything is correct:
-        # application folder and compiled interpreter folder.
-        correct_folders = ["./opt/jtrouble", "./opt/python"]
-        assert all((True if any(folder in file_entry for folder in correct_folders)
-                    else False
-                    for file_entry in file_list_purged))
-        assert any(correct_folders[0] in file_entry
-                   for file_entry in file_list_purged)
-        assert any(correct_folders[1] in file_entry
-                   for file_entry in file_list_purged)
-
-
-def _generate_rpm_from_git_nosetup_compile(centos_version):
-    with temporary_directory() as output_dir:
-        builder_parameters = {"app": 'jtrouble',
-                              "version": '1.0.0',
-                              "source": git(
-                                    uri='https://github.com/objectified/jtrouble',
-                                    branch='master'
-                              ),
-                              "profile": centos_version,
-                              "package_install_root": "/opt",
-                              "python_basedir": "/opt/python",
-                              "compile_python": True,
-                              "python_version": '3.4.4',
-                              "output_folder": output_dir,
-                              "output_script": True}
-        target_file = _generate_rpm(builder_parameters)
-        purged_file_list = _get_purged_file_list(target_file,
-                                                 RPM_COMPILE_FILTER)
-        # At this point only two folders should remain if everything is correct:
-        # application folder and compiled interpreter folder.
-        correct_folders = ["/opt/jtrouble", "/opt/python"]
-        assert all((True if any(folder in file_entry for folder in correct_folders)
-                    else False
-                    for file_entry in purged_file_list))
-        assert any(correct_folders[0] in file_entry
-                   for file_entry in purged_file_list)
-        assert any(correct_folders[1] in file_entry
-                   for file_entry in purged_file_list)
-
-
-@pytest.mark.rpm
-@pytest.mark.centos
-def test_generate_rpm_from_git_nosetup_compile_centos():
-    _generate_rpm_from_git_nosetup_compile("centos")
-
-@pytest.mark.rpm
-@pytest.mark.centos7
-def test_generate_rpm_from_git_nosetup_compile_centos7():
-    _generate_rpm_from_git_nosetup_compile("centos7")
-
 def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     builder_configurations = {
         ## TODO: Some tests fail if I leave app_name at "app" but not hardcode it. Give it a second thought and leave coherent.
@@ -557,9 +484,95 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "after_remove": 'packaging/postuninst.sh',
             "output_folder": output_dir,
             "output_script": True
-        }
+        },
+        "jtrouble-test-generate-package-from-git-nosetup-compile": {
+            "app": 'jtrouble',
+            "version": '1.0.0',
+            "source": git(
+                uri='https://github.com/objectified/jtrouble',
+                branch='master'
+            ),
+            "profile": profile_name,
+            "package_install_root": "/opt",
+            "python_basedir": "/opt/python",
+            "compile_python": True,
+            "python_version": '3.4.4',
+            "output_folder": output_dir,
+            "output_script": True}
     }
     return builder_configurations[app_name]
+
+
+# Scenario 2.- Project not containing a setup.py and compiles Python -> package
+# both the project dir and the Python basedir
+@pytest.mark.deb
+@pytest.mark.generate_from_git_nosetup_compile
+def test_generate_deb_from_git_nosetup_compile():
+    _generate_package_from_git_nosetup_compile("ubuntu-lts",
+                                               "jtrouble-test-generate-package-from-git-nosetup-compile",
+                                               _generate_deb,
+                                               DEB_COMPILE_FILTER,
+                                               ["./opt/jtrouble", "./opt/python"])
+
+
+@pytest.mark.rpm
+@pytest.mark.centos
+@pytest.mark.generate_from_git_nosetup_compile
+def test_generate_rpm_from_git_nosetup_compile_centos():
+    _generate_package_from_git_nosetup_compile("centos",
+                                               "jtrouble-test-generate-package-from-git-nosetup-compile",
+                                               _generate_rpm,
+                                               RPM_COMPILE_FILTER,
+                                               ["/opt/jtrouble", "/opt/python"])
+
+@pytest.mark.rpm
+@pytest.mark.centos7
+@pytest.mark.generate_from_git_nosetup_compile
+def test_generate_rpm_from_git_nosetup_compile_centos7():
+    _generate_package_from_git_nosetup_compile("centos7",
+                                               "jtrouble-test-generate-package-from-git-nosetup-compile",
+                                               _generate_rpm,
+                                               RPM_COMPILE_FILTER,
+                                               ["/opt/jtrouble", "/opt/python"])
+
+
+@pytest.mark.pkg
+@pytest.mark.generate_from_git_nosetup_compile
+def test_generate_pkg_from_git_nosetup_compile():
+    _generate_package_from_git_nosetup_compile("archlinux",
+                                               "jtrouble-test-generate-package-from-git-nosetup-compile",
+                                               _generate_pkg,
+                                               PKG_COMPILE_FILTER,
+                                               ["/opt", "/opt/jtrouble", "/opt/python"])
+
+
+## TODO: This function code is almost identical to the one in _generate_package_from_git_nosetup_nocompile. Try to resolve redundancy.
+def _generate_package_from_git_nosetup_compile(distro,
+                                               package_name,
+                                               packager_function,
+                                               compile_filter,
+                                               correct_folders):
+    with temporary_directory() as output_dir:
+        builder_parameters = _get_builder_parameters(package_name,
+                                                     distro,
+                                                     "",
+                                                     output_dir)
+        target_file = packager_function(builder_parameters)
+        file_list_purged = _get_purged_file_list(target_file,
+                                                 compile_filter)
+        # At this point only a folder should remain if everything is correct.
+        assert all((True if any(folder in file_entry for folder in correct_folders)
+                    else False
+                    for file_entry in file_list_purged))
+        # At this point only two folders should remain if everything is correct:
+        # application folder and compiled interpreter folder: ["./opt/jtrouble", "./opt/python"]
+        assert all((True if any(folder in file_entry for folder in correct_folders)
+                    else False
+                    for file_entry in file_list_purged))
+        assert any(correct_folders[0] in file_entry
+                   for file_entry in file_list_purged)
+        assert any(correct_folders[1] in file_entry
+                   for file_entry in file_list_purged)
 
 
 # Scenario 3 - Project containing a setup.py and using a prebuilt Python package
