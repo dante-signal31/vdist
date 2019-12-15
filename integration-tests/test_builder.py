@@ -227,88 +227,6 @@ def _get_copied_script_path(_configuration):
 #   https://github.com/dante-signal31/vdist/pull/7#issuecomment-177818848
 
 
-# Scenario 1 - Project containing a setup.py and compiles Python -> only package
-# the whole Python basedir.
-@pytest.mark.deb
-def test_generate_deb_from_git_setup_compile():
-    with temporary_directory() as output_dir:
-        builder_parameters = {
-            "app": 'geolocate',
-            "version": '1.4.1',
-            "source": git(
-                uri='https://github.com/dante-signal31/geolocate',
-                branch='vdist_tests'
-            ),
-            "profile": 'ubuntu-lts',
-            "compile_python": True,
-            "python_version": '3.5.3',
-            "fpm_args": FPM_ARGS_GEOLOCATE,
-            "requirements_path": '/REQUIREMENTS.txt',
-            "build_deps": ["python3-all-dev", "build-essential", "libssl-dev",
-                           "pkg-config", "libdbus-glib-1-dev", "gnome-keyring",
-                           "libffi-dev"],
-            "runtime_deps": ["libssl1.0.0", "python3-dbus", "gnome-keyring"],
-            "after_install": 'packaging/postinst.sh',
-            "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir,
-            "output_script": True
-        }
-        target_file = _generate_deb(builder_parameters)
-        file_list_purged = _get_purged_file_list(target_file,
-                                                 DEB_COMPILE_FILTER)
-        # At this point only a folder should remain if everything is correct.
-        correct_install_path = "./opt/geolocate"
-        assert all((True if correct_install_path in file_entry else False
-                    for file_entry in file_list_purged))
-        # Geolocate launcher should be in bin folder too.
-        geolocate_launcher = "./opt/geolocate/bin/geolocate"
-        assert geolocate_launcher in file_list_purged
-
-
-def _generate_rpm_from_git_setup_compile(centos_version):
-    with temporary_directory() as output_dir:
-        builder_parameters = {
-            "app": 'vdist',
-            "version": '1.1.0',
-            "source": git(
-                uri='https://github.com/dante-signal31/vdist',
-                branch='vdist_tests'
-            ),
-            "profile": centos_version,
-            "compile_python": True,
-            "python_version": '3.5.3',
-            "fpm_args": FPM_ARGS_VDIST,
-            "requirements_path": '/REQUIREMENTS.txt',
-            "runtime_deps": ["openssl", "docker-ce"],
-            "after_install": 'packaging/postinst.sh',
-            "after_remove": 'packaging/postuninst.sh',
-            "output_folder": output_dir,
-            "output_script": True
-        }
-        target_file = _generate_rpm(builder_parameters)
-        file_list_purged = _get_purged_file_list(target_file,
-                                                 RPM_COMPILE_FILTER)
-        # At this point only a folder should remain if everything is correct.
-        correct_install_path = "/opt/vdist"
-        assert all((True if correct_install_path in file_entry else False
-                    for file_entry in file_list_purged))
-        # vdist launcher should be in bin folder too.
-        vdist_launcher = "/opt/vdist/bin/vdist"
-        assert vdist_launcher in file_list_purged
-
-
-@pytest.mark.rpm
-@pytest.mark.centos
-def test_generate_rpm_from_git_setup_compile_centos():
-    _generate_rpm_from_git_setup_compile("centos")
-
-
-@pytest.mark.rpm
-@pytest.mark.centos7
-def test_generate_rpm_from_git_setup_compile_centos7():
-    _generate_rpm_from_git_setup_compile("centos7")
-
-
 def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     builder_configurations = {
         ## TODO: Some tests fail if I leave app_name at "app" but not hardcode it. Give it a second thought and leave coherent.
@@ -498,9 +416,100 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "compile_python": True,
             "python_version": '3.4.4',
             "output_folder": output_dir,
-            "output_script": True}
+            "output_script": True
+        },
+        "vdist-test-generate-package-from-git-setup-compile": {
+                "app": 'vdist',
+                "version": '1.1.0',
+                "source": git(
+                    uri='https://github.com/dante-signal31/vdist',
+                    branch='vdist_tests'
+                ),
+                "profile": profile_name,
+                "compile_python": True,
+                "python_version": '3.5.3',
+                "fpm_args": FPM_ARGS_VDIST,
+                "requirements_path": '/REQUIREMENTS.txt',
+                "runtime_deps": ["openssl", "docker-ce"],
+                "after_install": 'packaging/postinst.sh',
+                "after_remove": 'packaging/postuninst.sh',
+                "output_folder": output_dir,
+                "output_script": True
+        }
     }
     return builder_configurations[app_name]
+
+
+# Scenario 1 - Project containing a setup.py and compiles Python -> only package
+# the whole Python basedir.
+@pytest.mark.deb
+@pytest.mark.generate_from_git_setup_compile
+def test_generate_deb_from_git_setup_compile():
+    _generate_package_from_git_setup_compile("ubuntu-lts",
+                                             "vdist-test-generate-package-from-git-setup-compile",
+                                             _generate_deb,
+                                             DEB_COMPILE_FILTER,
+                                             ["./opt/vdist"],
+                                             "./opt/vdist/bin/vdist")
+
+
+@pytest.mark.rpm
+@pytest.mark.centos
+@pytest.mark.generate_from_git_setup_compile
+def test_generate_rpm_from_git_setup_compile_centos():
+    _generate_package_from_git_setup_compile("centos",
+                                             "vdist-test-generate-package-from-git-setup-compile",
+                                             _generate_rpm,
+                                             RPM_COMPILE_FILTER,
+                                             ["/opt/vdist"],
+                                             "/opt/vdist/bin/vdist")
+
+
+@pytest.mark.rpm
+@pytest.mark.centos7
+@pytest.mark.generate_from_git_setup_compile
+def test_generate_rpm_from_git_setup_compile_centos7():
+    _generate_package_from_git_setup_compile("centos7",
+                                             "vdist-test-generate-package-from-git-setup-compile",
+                                             _generate_rpm,
+                                             RPM_COMPILE_FILTER,
+                                             ["/opt/vdist"],
+                                             "/opt/vdist/bin/vdist")
+
+
+@pytest.mark.pkg
+@pytest.mark.generate_from_git_setup_compile
+def test_generate_pkg_from_git_setup_compile():
+    _generate_package_from_git_setup_compile("archlinux",
+                                             "vdist-test-generate-package-from-git-setup-compile",
+                                             _generate_pkg,
+                                             PKG_COMPILE_FILTER,
+                                             ["/opt", "/opt/vdist"],
+                                             "/opt/vdist/bin/vdist")
+
+
+# TODO: This function code is almost identical to the one in _generate_package_from_git_nosetup_nocompile. Try to resolve redundancy.
+def _generate_package_from_git_setup_compile(distro,
+                                             package_name,
+                                             packager_function,
+                                             compile_filter,
+                                             correct_folders,
+                                             launcher_path):
+    with temporary_directory() as output_dir:
+        builder_parameters = _get_builder_parameters(package_name,
+                                                     distro,
+                                                     "",
+                                                     output_dir)
+        target_file = packager_function(builder_parameters)
+        file_list_purged = _get_purged_file_list(target_file,
+                                                 compile_filter)
+        # At this point only a folder should remain if everything is correct.
+        assert all((True if any(folder in file_entry for folder in correct_folders)
+                    else False
+                    for file_entry in file_list_purged))
+        # Launcher should be in bin folder too.
+        assert launcher_path in file_list_purged
+
 
 
 # Scenario 2.- Project not containing a setup.py and compiles Python -> package
