@@ -148,85 +148,6 @@ def _get_purged_file_list(filepath, file_filter):
 #     file_list_purged = _purge_list(file_list, file_filter)
 #     return file_list_purged
 
-
-@pytest.mark.deb
-def test_generate_deb_from_git():
-    # TODO: Every test fails except these ones:
-    # test_generate_deb_from_git_setup_compile
-    # test_generate_deb_from_git_nosetup_compile
-    # test_generate_deb_from_git_nosetup_nocompile
-    # Find out what's happening with every other test.
-    # You could start debugging this test.
-    with temporary_directory() as output_dir:
-        builder_parameters = {"app": 'vdist-test-generate-deb-from-git',
-                              "version": '1.0',
-                              "source": git(
-                                  uri='https://github.com/dante-signal31/vdist',
-                                  branch='vdist_tests'
-                              ),
-                              "profile": 'ubuntu-lts',
-                              "output_folder": output_dir,
-                              "output_script": True}
-        _ = _generate_deb(builder_parameters)
-
-
-def _generate_rpm_from_git(centos_version):
-    with temporary_directory() as output_dir:
-        builder_parameters = {"app": 'vdist-test-generate-rpm-from-git',
-                              "version": '1.0',
-                              "source": git(
-                                  uri='https://github.com/dante-signal31/vdist',
-                                  branch='vdist_tests'
-                              ),
-                              "profile": centos_version,
-                              "output_folder": output_dir,
-                              "output_script": True}
-        _ = _generate_rpm(builder_parameters)
-
-
-@pytest.mark.rpm
-@pytest.mark.centos
-def test_generate_rpm_from_git_centos():
-    _generate_rpm_from_git("centos")
-
-
-@pytest.mark.rpm
-@pytest.mark.centos7
-def test_generate_rpm_from_git_centos7():
-    _generate_rpm_from_git("centos7")
-
-
-def test_output_script():
-    with temporary_directory() as output_dir:
-        ubuntu_argparsed_arguments_output_script = test_console.UBUNTU_ARGPARSED_ARGUMENTS.copy()
-        ubuntu_argparsed_arguments_output_script["output_script"] = True
-        ubuntu_argparsed_arguments_output_script["output_folder"] = output_dir
-        _configuration = configuration.Configuration(ubuntu_argparsed_arguments_output_script)
-        builder.build_package(_configuration)
-        copied_script_path = _get_copied_script_path(_configuration)
-        assert os.path.isfile(copied_script_path)
-
-
-def _get_copied_script_path(_configuration):
-    script_file_name = builder._get_script_output_filename(_configuration)
-    script_output_folder = _configuration.output_folder
-    copied_script_path = os.path.join(script_output_folder, script_file_name)
-    return copied_script_path
-
-
-# Scenarios to test:
-# 1.- Project containing a setup.py and compiles Python -> only package the
-#     whole Python basedir.
-# 2.- Project not containing a setup.py and compiles Python -> package both the
-#     project dir and the Python basedir.
-# 3.- Project containing a setup.py and using a prebuilt Python package (e.g.
-#     not compiling) -> package the custom Python basedir only
-# 4.- Project not containing a setup.py and using a prebuilt Python package ->
-#     package both the project dir and the Python basedir
-# More info at:
-#   https://github.com/dante-signal31/vdist/pull/7#issuecomment-177818848
-
-
 def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
     builder_configurations = {
         ## TODO: Some tests fail if I leave app_name at "app" but not hardcode it. Give it a second thought and leave coherent.
@@ -419,26 +340,112 @@ def _get_builder_parameters(app_name, profile_name, temp_dir, output_dir):
             "output_script": True
         },
         "vdist-test-generate-package-from-git-setup-compile": {
-                "app": 'vdist',
-                "version": '1.1.0',
-                "source": git(
-                    uri='https://github.com/dante-signal31/vdist',
-                    branch='vdist_tests'
-                ),
-                "profile": profile_name,
-                "compile_python": True,
-                "python_version": '3.5.3',
-                "fpm_args": FPM_ARGS_VDIST,
-                "requirements_path": '/REQUIREMENTS.txt',
-                "runtime_deps": ["openssl", "docker-ce"],
-                "after_install": 'packaging/postinst.sh',
-                "after_remove": 'packaging/postuninst.sh',
-                "output_folder": output_dir,
-                "output_script": True
+            "app": 'vdist',
+            "version": '1.1.0',
+            "source": git(
+                uri='https://github.com/dante-signal31/vdist',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "compile_python": True,
+            "python_version": '3.5.3',
+            "fpm_args": FPM_ARGS_VDIST,
+            "requirements_path": '/REQUIREMENTS.txt',
+            "runtime_deps": ["openssl", "docker-ce"],
+            "after_install": 'packaging/postinst.sh',
+            "after_remove": 'packaging/postuninst.sh',
+            "output_folder": output_dir,
+            "output_script": True
+        },
+        "vdist-test-generate-from-git": {
+            "app": app_name,
+            "version": '1.0',
+            "source": git(
+                uri='https://github.com/dante-signal31/vdist',
+                branch='vdist_tests'
+            ),
+            "profile": profile_name,
+            "output_folder": output_dir,
+            "output_script": True
         }
     }
     return builder_configurations[app_name]
 
+
+@pytest.mark.deb
+@pytest.mark.generate_from_git
+def test_generate_deb_from_git():
+    _generate_package_from_git("ubuntu-lts",
+                               "vdist-test-generate-from-git",
+                               _generate_deb)
+
+
+def _generate_package_from_git(distro,
+                               package_name,
+                               packager_function):
+    with temporary_directory() as output_dir:
+        builder_parameters = _get_builder_parameters(package_name,
+                                                     distro,
+                                                     "",
+                                                     output_dir)
+        _ = packager_function(builder_parameters)
+
+
+@pytest.mark.rpm
+@pytest.mark.centos
+@pytest.mark.generate_from_git
+def test_generate_rpm_from_git_centos():
+    _generate_package_from_git("centos",
+                               "vdist-test-generate-from-git",
+                               _generate_rpm)
+
+
+@pytest.mark.rpm
+@pytest.mark.centos7
+@pytest.mark.generate_from_git
+def test_generate_rpm_from_git_centos7():
+    _generate_package_from_git("centos7",
+                               "vdist-test-generate-from-git",
+                               _generate_rpm)
+
+
+@pytest.mark.pkg
+@pytest.mark.generate_from_git
+def test_generate_pkg_from_git():
+    _generate_package_from_git("archlinux",
+                               "vdist-test-generate-from-git",
+                               _generate_pkg)
+
+
+def test_output_script():
+    with temporary_directory() as output_dir:
+        ubuntu_argparsed_arguments_output_script = test_console.UBUNTU_ARGPARSED_ARGUMENTS.copy()
+        ubuntu_argparsed_arguments_output_script["output_script"] = True
+        ubuntu_argparsed_arguments_output_script["output_folder"] = output_dir
+        _configuration = configuration.Configuration(ubuntu_argparsed_arguments_output_script)
+        builder.build_package(_configuration)
+        copied_script_path = _get_copied_script_path(_configuration)
+        assert os.path.isfile(copied_script_path)
+
+
+def _get_copied_script_path(_configuration):
+    script_file_name = builder._get_script_output_filename(_configuration)
+    script_output_folder = _configuration.output_folder
+    copied_script_path = os.path.join(script_output_folder, script_file_name)
+    return copied_script_path
+
+
+# Scenarios to test:
+# 1.- Project containing a setup.py and compiles Python -> only package the
+#     whole Python basedir.
+# 2.- Project not containing a setup.py and compiles Python -> package both the
+#     project dir and the Python basedir.
+# 3.- Project containing a setup.py and using a prebuilt Python package (e.g.
+#     not compiling) -> package the custom Python basedir only
+# 4.- Project not containing a setup.py and using a prebuilt Python package ->
+#     package both the project dir and the Python basedir
+# More info at:
+#   https://github.com/dante-signal31/vdist/pull/7#issuecomment-177818848
 
 # Scenario 1 - Project containing a setup.py and compiles Python -> only package
 # the whole Python basedir.
