@@ -28,3 +28,7 @@ runtime_deps = libssl1.0.0, docker-ce
 [Centos-package]
 profile = centos
 runtime_deps = openssl, docker-ce
+
+[Archlinux-package]
+profile = archlinux
+runtime_deps = openssl, docker
