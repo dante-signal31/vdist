@@ -197,7 +197,7 @@ resulting package
 OS package both in the name and in its meta information
 - `profile` :: the name of the profile to use for this specific build; its
 value should be one of two things:
-    * a vdist built-in profile (currently `centos`, `ubuntu-lts` and
+    * a vdist built-in profile (currently `centos`, `ubuntu-lts`, `archlinux` and
     `debian-wheezy` are available, `centos7`, `ubuntu-trusty` are deprecated 
     and will be removed soon).
     * a custom profile that you create yourself; see

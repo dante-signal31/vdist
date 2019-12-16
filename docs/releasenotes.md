@@ -1,6 +1,11 @@
 ## Release notes
 
-### 2.0.0 (2019/01/11)
+### 2.1.0 (2019/12/16)
+- "archlinux" profile added. Now you can get your application into a .pkg.xz 
+Archlinux package that can be installed with pacman.
+- Integration tests greatly refactored to make easier add further profiles.
+
+### 2.0.0 (2019/11/01)
 - "ubuntu-trusty" profile is now deprecated. Included an "ubuntu-lts" instead. This 
 new profile will point to current Ubuntu Long Term Support version. Be aware that this
 means that docker image used with this profile will change in the moment Ubuntu
@@ -12,7 +17,6 @@ that that docker image will change as happens with the one related to "ubunu-lts
 removed it from available profiles. I'm going to keep centos6 related code for a 
 time just in case anyone find a way to fix it. As time passes that code will be 
 entirely removed.
-
 
 ### 1.7.5 (2019/04/15)
 - Fixed wrong URL at manpage.

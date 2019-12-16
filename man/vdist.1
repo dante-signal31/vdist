@@ -78,7 +78,7 @@ does not use a configuration file but allows you to set parameters as command ar
 .nf
 .RS
 $ vdist manual --app geolocate --version 1.3.0 --source_git https://github.com/dante-signal31/geolocate,master
---profile ubuntu-trusty --compile_python --python_version 3.4.4 --fpm_args '--maintainer dante.signal31@gmail.com
+--profile ubuntu-lts --compile_python --python_version 3.4.4 --fpm_args '--maintainer dante.signal31@gmail.com
 -a native --url https://github.com/dante-signal31/geolocate --description "This program accepts any text and searchs
 inside every IP address." --license BSD-3 --category net' --requirements_path /REQUIREMENTS.txt --runtime_deps
 libssl1.0.0 dummy1.0.0 --output_folder ./dist --after_install = packaging/postinst.sh
@@ -122,7 +122,7 @@ The version of the application; this is used when building the OS package both i
 The name of the profile to use for this specific build; its value should be one of two things:
 .RS
 .IP \[bu] 2
-A vdist built-in profile (for instance \fIcentos\fR or \fIubuntu-lts\fR).
+A vdist built-in profile (for instance \fIcentos\fR, \fIarchlinux\fR or \fIubuntu-lts\fR).
 .IP \[bu] 2
 A custom profile that you create yourself; see \fI"How to customize"\fR for instructions.
 .RE
