@@ -21,13 +21,19 @@ env:
  global:
  - secure: "Ig3i1GxGTxz+J1LR46cmkkWzpHBUsUVpTVJZ5nyrH6781eoQmZStNfBdmn32MogumbyTnQzUEtWHEdAMErwtmOcCOo0LkrHKYNlJopVA06NwO7+IO8FGpSEydeMYFMsWdEO8Hg2vk/xr+K7UjVcJvG0usPxpEpIE17abif64mnDJXuB3VHchi/0I1BYimnmXVVFh93A+xOdXxbYjnPCDSQQ+f85NqTyMw1aTCkYuqG1XOZBdrO0rGd8McHjdbwLFOmN0Ve6SaollosztA/AgI5VcfsCn4tlSpg6DmY976QWkWchVVQI33vJEYGXiA4VFLzfGJsobQQZHuAieLBsvgj3Lz8OVVItnIPYVOcJ1qDbQP09VZKxFo9zDajJq1169oYSFlOj/0KrHJYEIGHwk+kwBWn6THdnadY8qeko1TEdWfrsgn3gmCUK9njQCA5UJM+7dPTWTE++fSBc0dZqXLV8ooPJ7ZjCMX7BCG0PR9Sr2PRLwOFtGYpWzdu4hIM8r8TBLZfo85LcGwa+mhOtfD+bdxCoYyvsmQzgGpcVWqJc76WuvemHSjmpV08mKu3UHyRPrmUP2yrD700u05kj9G6mpu0ZGzQgq567YaUy/jaQp2esNNhZ4PNdDvKtatUDY7OQ9RXguNKSYNI+b+7IgDdK3vQ4uCBMjDP4F1VEulJ0="
  matrix:
-  - TEST_TAG="test_generate_deb"
-  - TEST_TAG="test_generate_rpm_from_directory_centos"
-  - TEST_TAG="test_generate_rpm_from_git_centos"
-  - TEST_TAG="test_generate_rpm_from_git_directory_centos"
-  - TEST_TAG="test_generate_rpm_from_git_nosetup_compile_centos"
-  - TEST_TAG="test_generate_rpm_from_git_setup_compile_centos"
-  - TEST_TAG="test_generate_rpm_from_git_suffixed_centos"
+#  - TEST_TAG="test_generate_deb"
+#  - TEST_TAG="test_generate_pkg"
+#  - TEST_TAG="test_generate_rpm_from_directory_centos"
+#  - TEST_TAG="test_generate_rpm_from_git_centos"
+#  - TEST_TAG="test_generate_rpm_from_git_directory_centos"
+#  - TEST_TAG="test_generate_rpm_from_git_nosetup_compile_centos"
+#  - TEST_TAG="test_generate_rpm_from_git_setup_compile_centos"
+#  - TEST_TAG="test_generate_rpm_from_git_suffixed_centos"
+   - TEST_TAG="deb"
+   - TEST_TAG="pkg"
+   - TEST_TAG="centos"
+   - TEST_TAG="centos7"
+
 matrix:
   allow_failures:
   # Actually I only build with latest stable python release, but I want
@@ -63,10 +69,10 @@ before_install:
   # so we don't need to install it.
   - sudo apt-get install -qq libssl1.0.0 rpm
 install:
-  - pip install -r requirements.txt
+  - pip install -r test-requirements.txt
 script:
   # Seems that centos tests fail if I don't give them additional time.
-  - travis_wait 50 pytest -v -rs -k $TEST_TAG
+  - travis_wait 50 pytest -v -rs -m $TEST_TAG -n auto
 
 
 
