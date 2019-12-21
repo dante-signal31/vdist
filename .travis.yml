@@ -69,6 +69,7 @@ before_install:
   # so we don't need to install it.
   - sudo apt-get install -qq libssl1.0.0 rpm
 install:
+  - pip install -r requirements.txt
   - pip install -r test-requirements.txt
 script:
   # Seems that centos tests fail if I don't give them additional time.
