@@ -9,7 +9,9 @@ import tests.testing_tools as testing_tools
 import ci_scripts.ci_tools as ci_tools
 
 import vdist.configuration as configuration
+import vdist.console_parser as console_parser
 import vdist.builder as builder
+import vdist.vdist_launcher as launcher
 from vdist.source import git, git_directory, directory
 
 DEB_COMPILE_FILTER = [r'[^\.]', r'\./$', r'\./usr/', r'\./opt/$']
@@ -43,6 +45,41 @@ FPM_ARGS_VDIST = '--maintainer dante.signal31@gmail.com -a native ' \
                  'virtualenv. This means that your application will ' \
                  'not depend on OS provided packages of Python modules, ' \
                  'including their versions." --license MIT --category net'
+
+TEST_CONFIGURATION_FILE = """
+[DEFAULT]
+app = vdist
+# All version tags, even bintray json descriptors, are automatically updated from next value.
+version = 1.1.0
+# source_git = https://github.com/dante-signal31/${app}, vdist_tests
+source_git = https://github.com/dante-signal31/${app}, fix_scripts
+fpm_args = --maintainer dante.signal31@gmail.com -a native --url
+    https://github.com/dante-signal31/${app} --description
+    "vdist (Virtualenv Distribute) is a tool that lets you build OS packages
+     from your Python applications, while aiming to build an
+     isolated environment for your Python project by utilizing virtualenv. This
+     means that your application will not depend on OS provided packages of
+     Python modules, including their versions."
+    --license MIT --category net
+requirements_path = ./requirements.txt
+compile_python = True
+python_version = 3.7.5
+output_folder = ./package_dist/
+after_install = packaging/postinst.sh
+after_remove = packaging/postuninst.sh
+
+[Ubuntu-package]
+profile = ubuntu-lts
+runtime_deps = libssl1.0.0, docker-ce
+
+# [Centos-package]
+# profile = centos
+# runtime_deps = openssl, docker-ce
+# 
+# [Archlinux-package]
+# profile = archlinux
+# runtime_deps = openssl, docker
+"""
 
 VDIST_GITHUB_REPOSITORY = 'https://github.com/dante-signal31/vdist'
 VDIST_TEST_BRANCH = "vdist_tests"
@@ -888,3 +925,20 @@ def _populate_directory(temp_dir):
     ci_tools.run_console_command("git checkout {}".format(VDIST_TEST_BRANCH))
 
 
+@pytest.mark.test_launcher
+def test_generate_packages_from_configuration_file():
+    configuration_file_name = "test_build.cnf"
+    files_to_test = ["vdist_1.1.0_amd64.deb"]
+    with temporary_directory() as temp_dir:
+        configuration_path_name = os.path.join(temp_dir,
+                                               configuration_file_name)
+        os.chdir(temp_dir)
+        with open(configuration_path_name, "w") as configuration_file:
+            configuration_file.write(TEST_CONFIGURATION_FILE)
+        console_arguments = console_parser.parse_arguments(["batch", configuration_path_name])
+        configurations = launcher._get_build_configurations(console_arguments)
+        launcher.run_builds(configurations)
+        for file in files_to_test:
+            file_pathname = os.path.join(temp_dir, "package_dist/", file)
+            assert os.path.isfile(file_pathname)
+            assert os.path.getsize(file_pathname) > 0
