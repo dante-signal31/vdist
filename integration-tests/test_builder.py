@@ -51,8 +51,7 @@ TEST_CONFIGURATION_FILE = """
 app = vdist
 # All version tags, even bintray json descriptors, are automatically updated from next value.
 version = 1.1.0
-# source_git = https://github.com/dante-signal31/${app}, vdist_tests
-source_git = https://github.com/dante-signal31/${app}, fix_scripts
+source_git = https://github.com/dante-signal31/${app}, vdist_tests
 fpm_args = --maintainer dante.signal31@gmail.com -a native --url
     https://github.com/dante-signal31/${app} --description
     "vdist (Virtualenv Distribute) is a tool that lets you build OS packages
@@ -72,13 +71,13 @@ after_remove = packaging/postuninst.sh
 profile = ubuntu-lts
 runtime_deps = libssl1.0.0, docker-ce
 
-# [Centos-package]
-# profile = centos
-# runtime_deps = openssl, docker-ce
-# 
-# [Archlinux-package]
-# profile = archlinux
-# runtime_deps = openssl, docker
+[Centos-package]
+profile = centos
+runtime_deps = openssl, docker-ce
+
+[Archlinux-package]
+profile = archlinux
+runtime_deps = openssl, docker
 """
 
 VDIST_GITHUB_REPOSITORY = 'https://github.com/dante-signal31/vdist'
@@ -928,7 +927,9 @@ def _populate_directory(temp_dir):
 @pytest.mark.test_launcher
 def test_generate_packages_from_configuration_file():
     configuration_file_name = "test_build.cnf"
-    files_to_test = ["vdist_1.1.0_amd64.deb"]
+    files_to_test = ["vdist_1.1.0_amd64.deb",
+                     "vdist-1.1.0-1.x86_64.rpm",
+                     "vdist-1.1.0-1-x86_64.pkg.tar.xz"]
     with temporary_directory() as temp_dir:
         configuration_path_name = os.path.join(temp_dir,
                                                configuration_file_name)

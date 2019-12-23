@@ -33,6 +33,7 @@ env:
    - TEST_TAG="pkg"
    - TEST_TAG="centos"
    - TEST_TAG="centos7"
+   - TEST_TAG="test_launcher"
 
 matrix:
   allow_failures:
