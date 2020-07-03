@@ -5,4 +5,5 @@
 - Create profile for Fedora.
 - Create profile for Suse.
 - Package private git repositories.
+- Use Poetry instead of git to install dependencies.
 - (Anything you want to propose...)
